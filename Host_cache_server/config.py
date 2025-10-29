@@ -1,0 +1,6 @@
+import socket
+SERVER = socket.gethostbyname(socket.gethostname())
+PORT = 5050
+ADDR = (SERVER, PORT)
+BOOTSTRAP_STATUS = ["accept", "reject"]
+MAX_PEERS = 100
