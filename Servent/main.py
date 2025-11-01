@@ -2,6 +2,8 @@ import socket
 import json
 import config.settings as settings
 # Identify bandwidth and assign role
+# Just use speedtest library lmao
+
 
 # Bootstrap request
 def request_bootstrap():
