@@ -1,17 +1,17 @@
 import json
 import time
 
-from peer_cache import get_ultra_peers
+from peer_cache import get_subnetwork
 
 def parse_requests(data):
     return json.loads(data.decode())
 
-def bootstrap_success():
+def bootstrap_success(id):
     return json.dumps({
         "type": "bootstrap_response",
         "status": "ok",
         "reason": "",
-        "ultra_peers": get_ultra_peers()
+        "subnetwork": get_subnetwork(id)
     }).encode()
 
 def bootstrap_failed(failure_message):
