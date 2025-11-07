@@ -22,11 +22,10 @@ def handle_request(conn):
             return
         request = protocol.parse_requests(data)
         if request.get("type") == "bootstrap":
-            if request.get("role") == "ultra_peer":
-                peer_cache.add_ultra_peer(conn.getpeername()[0], request.get("port"))
+            id = peer_cache.add_peer(conn.getpeername()[0], request)
 
             # Assume that everything is okay
-            response = protocol.bootstrap_success()
+            response = protocol.bootstrap_success(id)
             conn.sendall(response)
         
         elif request.get("type") == "exit":
