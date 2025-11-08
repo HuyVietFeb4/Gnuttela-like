@@ -12,7 +12,7 @@ peers = {}
 peer_id = 0
 
 # multicast groups
-# [(id, [ip_octet1, ip_octet2, ip_octet3, ip_octet4], port)]
+# [([ids], [ip_octet1, ip_octet2, ip_octet3, ip_octet4], port)]
 groups = []
 
 def add_peer(ip, request):
@@ -50,14 +50,14 @@ def add_peer(ip, request):
 # return ip, port of multicast group
 def get_subnetwork(id):
     if id in subnetworks:
-        for _id, ip, port in groups:
-            if _id == id:
+        for ids, ip, port in groups:
+            if id in ids:
                 return ip, port
     else:
         for ultra_node, children in subnetworks.items():
             if id in children:
-                for _id, ip, port in groups:
-                    if _id == ultra_node:
+                for ids, ip, port in groups:
+                    if ultra_node in ids:
                         return ip, port
     return None, None
 
