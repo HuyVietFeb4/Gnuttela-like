@@ -25,6 +25,7 @@ def handle_request(conn):
             id = peer_cache.add_peer(conn.getpeername()[0], request)
 
             # Assume that everything is okay
+            # Return multicast ip address and port
             response = protocol.bootstrap_success(id)
             conn.sendall(response)
         
@@ -52,7 +53,7 @@ def start_server():
             callback(key.fileobj)
 
 
-# Peer will comunicating with the server by json format
+# Peer will communicate with the server by json format
 # Client request with format
 # peer_info = {
 #     "type": "bootstrap",
@@ -65,7 +66,7 @@ def start_server():
 #     "port": <port_number>, 
 #     "role": <peer_role>
 # }
-# Server will send back all of the ultra peer infos to the client who request it 
+# Server will send back all the ultra peer infos to the client who request it
 # respond = {
 #     "type": "bootstrap_response",
 #     "status": <reasons>,
