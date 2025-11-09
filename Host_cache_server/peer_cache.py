@@ -56,9 +56,7 @@ def get_subnetwork(id):
     else:
         for ultra_node, children in subnetworks.items():
             if id in children:
-                for ids, ip, port in groups:
-                    if ultra_node in ids:
-                        return ip, port
+                return peers[ultra_node]['ip'], peers[ultra_node]['port']
     return None, None
 
 def generate_multicast_group(id):
