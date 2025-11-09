@@ -1,10 +1,12 @@
 import socket
+import struct
 import json
 import os
 import subprocess
 import config.settings as settings
 import random
 import Host_cache_server.config as config
+import protocol.message as message
 # Identify bandwidth and assign role
 # Just use speedtest library lmao
 
@@ -44,8 +46,18 @@ def request_bootstrap():
             ultra_ip = response.get['subnetwork'][0]
             ultra_port = response.get['subnetwork'][1]
 
+def multicast(filename):
+    global multicast_ip, multicast_port
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP) as sock:
+        ttl = struct.pack('b', settings.MULTICAST_TTL)
+        sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
+
+        sock.sendto(message.ingroup_multicast_request(filename), (multicast_ip, multicast_port))
+        print(f"Sent file request to {multicast_ip}:{multicast_port}")
+
 def request_file(filename):
-    ...
+    if multicast_port is not None:
+        multicast(filename)
 
 def open_file(filename):
     filepath = os.path.join(settings.FILE_DIR, filename)
