@@ -1,7 +1,6 @@
 import time
 import psutil
-import speedtest
-
+import random
 
 def convert_to_gbit(value):
     '''
@@ -28,6 +27,8 @@ def bandwidth_calculator(duration=5): #default is 5 seconds
 
     return sent, recv
            # Upload, Download
+
+
 
 # if __name__ == "__main__":
 #     upload_bps, download_bps = bandwidth_calculator(10)

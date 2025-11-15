@@ -7,6 +7,7 @@ import config.settings as settings
 import random
 import Host_cache_server.config as config
 import protocol.message as message
+import protocol.peer_classification 
 # Identify bandwidth and assign role
 # Just use speedtest library lmao
 
@@ -20,7 +21,7 @@ ultra_port = None
 def request_bootstrap():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect(settings.SERVER_ADDR)
-        rating = random.randint(1, 5)
+        rating = protocol.peer_classification.assign_role_based_on_bandwidth()
 
         request = {
             "type": "bootstrap",
