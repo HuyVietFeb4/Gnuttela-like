@@ -1,0 +1,26 @@
+import json
+import zlib
+class data_processing_util:
+    @staticmethod
+    def read_file(path: str):
+        with open(path, 'rb') as f:
+            return f.read()
+    @staticmethod
+    def json_serializer(json_data) -> bytes:
+        json_str = json.dumps(json_data) # From json to str
+        json_bytes = json_str.encode("utf-8") # From str to bytes
+        return json_bytes
+    @staticmethod
+    def json_deserializer(json_bytes: bytes):
+        json_str = json_bytes.decode() # From bytes to str
+        json_data = json.loads(json_str) # From str to json
+        return json_data
+
+    @staticmethod
+    def compressor(byte_stream: bytes) -> bytes:
+        return zlib.compress(byte_stream)
+    @staticmethod
+    def decompressor(byte_stream):
+        return zlib.decompress(byte_stream)
+    
+    
