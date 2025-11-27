@@ -11,6 +11,35 @@ class data_processing_util:
         json_bytes = json_str.encode("utf-8") # From str to bytes
         return json_bytes
     @staticmethod
+    def bloom_serializer(bloom_filter) -> bytes:
+        '''
+        Serialize bloomfilter
+        input: bloom_filter object
+        return: abitrary bytes
+        '''
+        bloom_state = {
+            'capacity': bloom_filter.capacity,
+            'error_rate': bloom_filter.error_rate,
+            'size': bloom_filter.size,
+            'hash_count': bloom_filter.hash_count,
+            'bit_array': bloom_filter.bit_array
+        }
+        return json.dump(bloom_state).encode('utf-8')
+    @staticmethod
+    def bloom_deserializer(bloom_payload):
+        '''
+            Deserialize the to return bloom filter state
+            Return: 
+                bloom_state = {
+                    'capacity': bloom_filter.capacity,
+                    'error_rate': bloom_filter.error_rate,
+                    'size': bloom_filter.size,
+                    'hash_count': bloom_filter.hash_count,
+                    'bit_array': bloom_filter.bit_array
+                }
+        '''
+        return json.loads(bloom_payload.decode())
+    @staticmethod
     def json_deserializer(json_bytes: bytes):
         json_str = json_bytes.decode() # From bytes to str
         json_data = json.loads(json_str) # From str to json
