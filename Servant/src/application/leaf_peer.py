@@ -6,9 +6,9 @@ class Peer:
         self.multicast_ip = multicast_ip
         self.multicast_port = multicast_port
 
-    def initiate_file_search():
+    def ping(self):
         pass
-    def request_file_sharing():
+    def pong():
         pass
     def download_file():
         pass
