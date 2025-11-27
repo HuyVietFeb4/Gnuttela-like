@@ -1,6 +1,11 @@
-class leaf_peer:
-    def __init__(self, bloom_filter, ip_address, port):
-        pass
+class Peer:
+    def __init__(self, bloom_filter, ip, port, multicast_ip, multicast_port):
+        self.bloom_filter = bloom_filter
+        self.ip = ip
+        self.port = port
+        self.multicast_ip = multicast_ip
+        self.multicast_port = multicast_port
+
     def initiate_file_search():
         pass
     def request_file_sharing():

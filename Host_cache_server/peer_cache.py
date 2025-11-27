@@ -12,7 +12,9 @@ peers = {}
 peer_id = 0
 
 # multicast groups
-# [([ultra_node ids], [ip_octet1, ip_octet2, ip_octet3, ip_octet4], port)]
+# [([ultra_node ids], [ip_octet1, ip_octet2, ip_octet3, ip_octet4], port, in)]
+# in=True if internal multicast group
+# in=False if external multicast group
 groups = []
 
 def add_peer(ip, request):
@@ -22,7 +24,8 @@ def add_peer(ip, request):
     ultra = request.get('rating') > config.RATING_THRESHOLD
     if ultra:
         subnetworks[peer_id] = []
-        add_to_multicast_group(peer_id, location)
+        add_to_multicast_group(peer_id, location, True)
+        add_to_multicast_group(peer_id, location, False)
     else:
         ultra_peer_found = False
         if len(subnetworks) > 0:
@@ -36,12 +39,15 @@ def add_peer(ip, request):
                         ultra_peer = key
 
             if ultra_peer is not None:
-                subnetworks[ultra_peer] = peer_id
+                subnetworks[ultra_peer].append(peer_id)
+                for group in groups:
+                    if group[3] is True and ultra_peer in group[0]:
+                        group[0].append(peer_id)
                 ultra_peer_found = True
 
         if not ultra_peer_found:
             subnetworks[peer_id] = []
-            add_to_multicast_group(peer_id, location)
+            add_to_multicast_group(peer_id, location, False)
 
     peers[peer_id] = {"ip": ip, "port": port, "location": location, 'ultra': ultra}
     peer_id += 1
@@ -56,7 +62,10 @@ def get_subnetwork(id):
     else:
         for ultra_node, children in subnetworks.items():
             if id in children:
-                return peers[ultra_node]['ip'], peers[ultra_node]['port']
+                for group in groups:
+                    if group[3] is True and ultra_node in group[0]:
+                        # multicast ip, multicast port, ultra node ip, ultra node port
+                        return group[1], group[2], peers[ultra_node]['ip'], peers[ultra_node]['port']
     return None, None
 
 def generate_multicast_group(id):
@@ -81,11 +90,13 @@ def generate_multicast_group(id):
     return group
 
 # Add new subnetwork to multicast group
-def add_to_multicast_group(id, location):
+def add_to_multicast_group(id, location, typ):
+    if typ:
+        generate_multicast_group(id, True)
     min_dist = 0
     final_group = None
     for group in groups:
-        if len(group[0]) > config.MULTICAST_SIZE:
+        if group[3] is False and len(group[0]) > config.MULTICAST_SIZE:
             dists = [math.dist(location, _location) for _location in [peers[_id]['location'] for _id in group[0]]]
             avg_dist = sum(dists) / len(dists)
             if min_dist < avg_dist:
@@ -93,7 +104,7 @@ def add_to_multicast_group(id, location):
                 min_dist = avg_dist
 
     if final_group is None:
-        generate_multicast_group(id)
+        generate_multicast_group(id, False)
     else:
         final_group[0].append(id)
 
