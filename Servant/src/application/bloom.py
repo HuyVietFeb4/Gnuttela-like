@@ -4,10 +4,10 @@ sys.path.insert(0, '../../config')
 import math
 import hashlib
 
-import peer_settings as config
+# import peer_settings as config
 
 class BloomFilter:
-    def __init__(self, capacity, error_rate=config.ERROR_RATE):
+    def __init__(self, capacity, error_rate=0.01):
         """
         :param capacity: Expected number of filenames (n)
         :param error_rate: Desired false positive probability (p)

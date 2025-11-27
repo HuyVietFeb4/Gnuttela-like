@@ -1,16 +1,16 @@
 class Peer:
-    def __init__(self, bloom_filter, ip, port, multicast_ip, multicast_port):
+    def __init__(self, bloom_filter, list_port, network_table):
         self.bloom_filter = bloom_filter
-        self.ip = ip
-        self.port = port
-        self.multicast_ip = multicast_ip
-        self.multicast_port = multicast_port
+        self.listening_port = list_port
+        self.network_table = network_table
 
     def ping(self):
         pass
-    def pong():
+    def pong(self):
         pass
-    def download_file():
+    def query(self):
         pass
-    def upload_file():
+    def query_hit(self):
+        pass
+    def push(self):
         pass

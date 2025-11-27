@@ -1,6 +1,6 @@
 import speedtest
 import random
-from config.settings import ULTRA_PEER_BANDWIDTH_THRESHOLD
+from config.peer_settings import ULTRA_PEER_BANDWIDTH_THRESHOLD
 
 def rating_based_on_bandwidth(): # in Mbps
     st = speedtest.Speedtest()
