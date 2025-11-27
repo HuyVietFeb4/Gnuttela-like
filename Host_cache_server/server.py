@@ -57,7 +57,7 @@ def start_server():
 # Client request with format
 # peer_info = {
 #     "type": "bootstrap",
-#     "port": <port_number>, 
+#     "port": <port_number>, # Port number that peer use to listen to other peer request
 #     "role": <peer_role>
 # }
 # Client exit with format
