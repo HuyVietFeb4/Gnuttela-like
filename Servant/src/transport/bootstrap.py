@@ -22,7 +22,7 @@ def request_bootstrap(rating):
         print("Bootstrap response:")
         print(json.dumps(response, indent=2))
 
-        if rating > config.RATING_THRESHOLD:
+        if rating > bootstrap_config.RATING_THRESHOLD:
             global multicast_ip, multicast_port
             multicast_ip = response.get['subnetwork'][0]
             multicast_port = response.get['subnetwork'][1]
