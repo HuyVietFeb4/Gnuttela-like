@@ -4,7 +4,7 @@ from concurrent import futures
 from Servant.src.application.leaf_peer import Peer
 from Servant.src.application.ultra_peer import UltraPeer
 from Servant.src.application.bloom import BloomFilter
-from Servant.src.application.config import peer_settings
+from Servant.config import peer_settings
 from Servant.src.transport.network_table import network_table
 from Host_cache_server import config
 
