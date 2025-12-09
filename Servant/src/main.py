@@ -65,12 +65,8 @@ def announce_new_peer(server_ip, server_port, peer_ip, peer_port):
             print("Synchronization failed:", e.code(), e.details())
 
 if "__main__" == __name__:
-    # Get ip address
-    result = subprocess.run("hostname -I", shell=True, capture_output=True, text=True)
-    ip = result.stdout.split(" ")[0]
-
     # Bootstrap
-    result = request_bootstrap(ip)
+    result = request_bootstrap(peer_settings.HOST)
 
     # Initialize peer
     peer = Peer()
@@ -86,11 +82,11 @@ if "__main__" == __name__:
     # Announce new peer with other peers
     if peer.__class__ == Peer:
         for node in peer.network_table.get_peers_addresses():
-            ultra_ip, ultra_port = announce_new_peer(node[0], node[1], ip, peer_settings.PORT)
+            ultra_ip, ultra_port = announce_new_peer(node[0], node[1], peer_settings.HOST, peer_settings.PORT)
             peer.network_table.update_peer_role(ultra_ip, ultra_port, False)
     
     # Run PeerService server
-    PeerServiceThread = threading.Thread(target=PeerServe, args=(ip, peer_settings.PORT, peer))
+    PeerServiceThread = threading.Thread(target=PeerServe, args=(peer_settings.HOST, peer_settings.PORT, peer))
     PeerServiceThread.start()
     try:
         PeerServiceThread.join()
