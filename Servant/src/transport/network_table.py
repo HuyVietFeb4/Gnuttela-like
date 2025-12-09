@@ -8,8 +8,8 @@ class network_table:
     Structure:
         network_table = {
             (ip, port): {
-                "role": <role>,
-                "peer_id": <uuid in the network> 
+                "role": <role>, (True if leaf, False if ultra)
+                // "peer_id": <uuid in the network> 
                 "last_seen": <unix-time>
                 // More meta data if needed
             }
@@ -22,7 +22,7 @@ class network_table:
         self.network_table[(ip, port)] = {
             "role": role,
             "last_seen":  time.time(),
-            "peer_id": uuid.uuid4()
+            #"peer_id": uuid.uuid4()
         }
 
     def remove_peer(self, ip, port):
@@ -41,3 +41,11 @@ class network_table:
 
     def get_peer_id(self, ip, port):
         return self.network_table[(ip, port)]['peer_id']
+    
+    def get_peers_addresses(self):
+        return list(self.network_table.keys())[:-1]
+    
+    def get_ultra_peer(self):
+        for key, value in self.network_table.items():
+            if value['role'] is False:
+                return key
