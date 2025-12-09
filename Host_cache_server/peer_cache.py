@@ -1,7 +1,7 @@
 import math
-import config
+from Host_cache_server import config
 
-# {ultra_id: [id], id: []}
+# {subnet_id: [(ip, port)]}
 subnetworks = {}
 
 # store all nodes
@@ -11,47 +11,25 @@ peers = {}
 # node id
 peer_id = 0
 
+# subnetwork id
+subnet_id = 0
+
 # multicast groups
 # [([ultra_node ids], [ip_octet1, ip_octet2, ip_octet3, ip_octet4], port, in)]
 # in=True if internal multicast group
 # in=False if external multicast group
 groups = []
 
-def add_peer(ip, request):
-    global peer_id
-    port = request.get("port")
-    location = request.get("location")
-    ultra = request.get('rating') > config.RATING_THRESHOLD
-    if ultra:
-        subnetworks[peer_id] = []
-        add_to_multicast_group(peer_id, location, True)
-        add_to_multicast_group(peer_id, location, False)
-    else:
-        ultra_peer_found = False
-        if len(subnetworks) > 0:
-            min_dist = 0
-            ultra_peer = None
-            for key, value in peers.items():
-                if value['ultra'] and len(subnetworks[key]) < config.MAX_CHILDREN:
-                    dist = math.dist(location, value['location'])
-                    if dist < min_dist:
-                        min_dist = dist
-                        ultra_peer = key
-
-            if ultra_peer is not None:
-                subnetworks[ultra_peer].append(peer_id)
-                for group in groups:
-                    if group[3] is True and ultra_peer in group[0]:
-                        group[0].append(peer_id)
-                ultra_peer_found = True
-
-        if not ultra_peer_found:
-            subnetworks[peer_id] = []
-            add_to_multicast_group(peer_id, location, False)
-
-    peers[peer_id] = {"ip": ip, "port": port, "location": location, 'ultra': ultra}
-    peer_id += 1
-    return peer_id - 1
+def add_peer(ip, port):
+    global subnet_id
+    for _subnet_id, subnet in subnetworks.items():
+        if len(subnet) < config.MAX_NODES:
+            subnet.append((ip, port))
+            return _subnet_id, subnet
+    
+    subnetworks[subnet_id] = [(ip, port)]
+    subnet_id += 1
+    return subnet_id - 1, subnetworks[subnet_id - 1]
 
 # return ip, port of multicast group
 def get_subnetwork(id):
