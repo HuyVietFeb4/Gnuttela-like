@@ -1,0 +1,25 @@
+syntax = "proto3";
+package peer;
+
+service PeerService {
+    rpc Announce (NewPeerAddress) returns (UltraPeerAddress) {}
+    rpc ElectLeader (ElectionMsg) returns (ElectionResponse) {}
+}
+
+message ElectionMsg {
+    bytes id = 1;
+}
+
+message ElectionResponse {
+    string msg = 1;
+}
+
+message NewPeerAddress {
+    string ip = 1;
+    int32 port = 2;
+}
+
+message UltraPeerAddress {
+    string ip = 1;
+    int32 port = 2;
+}
