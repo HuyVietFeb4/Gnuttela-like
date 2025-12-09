@@ -1,11 +1,30 @@
-import socket
-import selectors
-import config
+import socket, selectors, grpc, threading, subprocess
+from concurrent import futures
 
-import protocol
-import peer_cache
+from Host_cache_server import protocol, peer_cache, config
+from Host_cache_server.grpc_bootstrap import bootstrap_pb2_grpc
+from Host_cache_server.grpc_bootstrap import bootstrap_pb2
 
 selector = selectors.DefaultSelector()
+
+# gRPC Boostrap server run on port + 1
+class BootstrapServicer(bootstrap_pb2_grpc.BootstrapServicer):
+    def RequestBootstrap(self, request, context):
+        print(f"Received bootstrap request from peer ({request.ip}:{request.port})")
+        subnet_id, subnet = peer_cache.add_peer(request.ip, request.port)
+        routing_table = [bootstrap_pb2.JoinResponse.Node(ip=_ip, port=_port) for _ip, _port in subnet]
+        return bootstrap_pb2.JoinResponse(subnetId=subnet_id, subnet=routing_table)
+    
+def BootstrapServe(ip):
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    bootstrap_pb2_grpc.add_BootstrapServicer_to_server(BootstrapServicer(), server)
+    server.add_insecure_port(f"{ip}:{config.PORT + 1}")
+    server.start()
+    print(f"gRPC Bootstrap server running on {ip}:{config.PORT + 1}")
+    try:
+        server.wait_for_termination()
+    except KeyboardInterrupt:
+        print("Shutting down...")
 
 def accept(sock):
     conn, addr = sock.accept()
@@ -78,4 +97,13 @@ def start_server():
 # }
 
 if __name__ == "__main__":
-    start_server()
+    command = "hostname -I"
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    ip = result.stdout.split(" ")[0]
+    BootstrapThread = threading.Thread(target=BootstrapServe, args=(ip,))
+    BootstrapThread.start()
+    try:
+        BootstrapThread.join()
+    except KeyboardInterrupt:
+        pass
+    #start_server()
