@@ -3,6 +3,7 @@ package bootstrap;
 
 service Bootstrap {
     rpc RequestBootstrap (JoinRequest) returns (JoinResponse) {}
+    rpc ExitNetwork (ExitRequest) returns (ExitResponse) {}
 }
 
 message JoinRequest {
@@ -19,4 +20,14 @@ message JoinResponse {
     }
 
     repeated Node subnet = 2;
+}
+
+message ExitRequest {
+    string ip = 1;
+    int32 port = 2;
+    int32 subnetId = 3;
+}
+
+message ExitResponse {
+    string msg = 1;
 }

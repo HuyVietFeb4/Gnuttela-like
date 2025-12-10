@@ -44,6 +44,11 @@ class PeerServiceStub(object):
                 request_serializer=peer__pb2.ElectionMsg.SerializeToString,
                 response_deserializer=peer__pb2.ElectionResponse.FromString,
                 _registered_method=True)
+        self.ExitNetwork = channel.unary_unary(
+                '/peer.PeerService/ExitNetwork',
+                request_serializer=peer__pb2.NewPeerAddress.SerializeToString,
+                response_deserializer=peer__pb2.ExitResponse.FromString,
+                _registered_method=True)
 
 
 class PeerServiceServicer(object):
@@ -61,6 +66,12 @@ class PeerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ExitNetwork(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_PeerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -73,6 +84,11 @@ def add_PeerServiceServicer_to_server(servicer, server):
                     servicer.ElectLeader,
                     request_deserializer=peer__pb2.ElectionMsg.FromString,
                     response_serializer=peer__pb2.ElectionResponse.SerializeToString,
+            ),
+            'ExitNetwork': grpc.unary_unary_rpc_method_handler(
+                    servicer.ExitNetwork,
+                    request_deserializer=peer__pb2.NewPeerAddress.FromString,
+                    response_serializer=peer__pb2.ExitResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -129,6 +145,33 @@ class PeerService(object):
             '/peer.PeerService/ElectLeader',
             peer__pb2.ElectionMsg.SerializeToString,
             peer__pb2.ElectionResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ExitNetwork(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/peer.PeerService/ExitNetwork',
+            peer__pb2.NewPeerAddress.SerializeToString,
+            peer__pb2.ExitResponse.FromString,
             options,
             channel_credentials,
             insecure,

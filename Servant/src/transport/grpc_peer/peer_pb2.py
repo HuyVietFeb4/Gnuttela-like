@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\npeer.proto\x12\x04peer\"\x19\n\x0b\x45lectionMsg\x12\n\n\x02id\x18\x01 \x01(\x0c\"\x1f\n\x10\x45lectionResponse\x12\x0b\n\x03msg\x18\x01 \x01(\t\"*\n\x0eNewPeerAddress\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\",\n\x10UltraPeerAddress\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\x32\x85\x01\n\x0bPeerService\x12:\n\x08\x41nnounce\x12\x14.peer.NewPeerAddress\x1a\x16.peer.UltraPeerAddress\"\x00\x12:\n\x0b\x45lectLeader\x12\x11.peer.ElectionMsg\x1a\x16.peer.ElectionResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\npeer.proto\x12\x04peer\"\x19\n\x0b\x45lectionMsg\x12\n\n\x02id\x18\x01 \x01(\x0c\"\x1f\n\x10\x45lectionResponse\x12\x0b\n\x03msg\x18\x01 \x01(\t\"*\n\x0eNewPeerAddress\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\",\n\x10UltraPeerAddress\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"\x1b\n\x0c\x45xitResponse\x12\x0b\n\x03msg\x18\x01 \x01(\t2\xc0\x01\n\x0bPeerService\x12:\n\x08\x41nnounce\x12\x14.peer.NewPeerAddress\x1a\x16.peer.UltraPeerAddress\"\x00\x12:\n\x0b\x45lectLeader\x12\x11.peer.ElectionMsg\x1a\x16.peer.ElectionResponse\"\x00\x12\x39\n\x0b\x45xitNetwork\x12\x14.peer.NewPeerAddress\x1a\x12.peer.ExitResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,6 +39,8 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_NEWPEERADDRESS']._serialized_end=122
   _globals['_ULTRAPEERADDRESS']._serialized_start=124
   _globals['_ULTRAPEERADDRESS']._serialized_end=168
-  _globals['_PEERSERVICE']._serialized_start=171
-  _globals['_PEERSERVICE']._serialized_end=304
+  _globals['_EXITRESPONSE']._serialized_start=170
+  _globals['_EXITRESPONSE']._serialized_end=197
+  _globals['_PEERSERVICE']._serialized_start=200
+  _globals['_PEERSERVICE']._serialized_end=392
 # @@protoc_insertion_point(module_scope)

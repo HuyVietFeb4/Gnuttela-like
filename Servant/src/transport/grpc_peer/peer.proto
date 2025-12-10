@@ -4,6 +4,7 @@ package peer;
 service PeerService {
     rpc Announce (NewPeerAddress) returns (UltraPeerAddress) {}
     rpc ElectLeader (ElectionMsg) returns (ElectionResponse) {}
+    rpc ExitNetwork (NewPeerAddress) returns (ExitResponse) {}
 }
 
 message ElectionMsg {
@@ -22,4 +23,8 @@ message NewPeerAddress {
 message UltraPeerAddress {
     string ip = 1;
     int32 port = 2;
+}
+
+message ExitResponse {
+    string msg = 1;
 }

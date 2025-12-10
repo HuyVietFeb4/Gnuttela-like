@@ -39,12 +39,23 @@ class BootstrapStub(object):
                 request_serializer=bootstrap__pb2.JoinRequest.SerializeToString,
                 response_deserializer=bootstrap__pb2.JoinResponse.FromString,
                 _registered_method=True)
+        self.ExitNetwork = channel.unary_unary(
+                '/bootstrap.Bootstrap/ExitNetwork',
+                request_serializer=bootstrap__pb2.ExitRequest.SerializeToString,
+                response_deserializer=bootstrap__pb2.ExitResponse.FromString,
+                _registered_method=True)
 
 
 class BootstrapServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def RequestBootstrap(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ExitNetwork(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -57,6 +68,11 @@ def add_BootstrapServicer_to_server(servicer, server):
                     servicer.RequestBootstrap,
                     request_deserializer=bootstrap__pb2.JoinRequest.FromString,
                     response_serializer=bootstrap__pb2.JoinResponse.SerializeToString,
+            ),
+            'ExitNetwork': grpc.unary_unary_rpc_method_handler(
+                    servicer.ExitNetwork,
+                    request_deserializer=bootstrap__pb2.ExitRequest.FromString,
+                    response_serializer=bootstrap__pb2.ExitResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -86,6 +102,33 @@ class Bootstrap(object):
             '/bootstrap.Bootstrap/RequestBootstrap',
             bootstrap__pb2.JoinRequest.SerializeToString,
             bootstrap__pb2.JoinResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ExitNetwork(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bootstrap.Bootstrap/ExitNetwork',
+            bootstrap__pb2.ExitRequest.SerializeToString,
+            bootstrap__pb2.ExitResponse.FromString,
             options,
             channel_credentials,
             insecure,

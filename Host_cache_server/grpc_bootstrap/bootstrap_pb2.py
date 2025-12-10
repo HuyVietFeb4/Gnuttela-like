@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x62ootstrap.proto\x12\tbootstrap\"\'\n\x0bJoinRequest\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"p\n\x0cJoinResponse\x12\x10\n\x08subnetId\x18\x01 \x01(\x05\x12,\n\x06subnet\x18\x02 \x03(\x0b\x32\x1c.bootstrap.JoinResponse.Node\x1a \n\x04Node\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\x32R\n\tBootstrap\x12\x45\n\x10RequestBootstrap\x12\x16.bootstrap.JoinRequest\x1a\x17.bootstrap.JoinResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0f\x62ootstrap.proto\x12\tbootstrap\"\'\n\x0bJoinRequest\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"p\n\x0cJoinResponse\x12\x10\n\x08subnetId\x18\x01 \x01(\x05\x12,\n\x06subnet\x18\x02 \x03(\x0b\x32\x1c.bootstrap.JoinResponse.Node\x1a \n\x04Node\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"9\n\x0b\x45xitRequest\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\x12\x10\n\x08subnetId\x18\x03 \x01(\x05\"\x1b\n\x0c\x45xitResponse\x12\x0b\n\x03msg\x18\x01 \x01(\t2\x94\x01\n\tBootstrap\x12\x45\n\x10RequestBootstrap\x12\x16.bootstrap.JoinRequest\x1a\x17.bootstrap.JoinResponse\"\x00\x12@\n\x0b\x45xitNetwork\x12\x16.bootstrap.ExitRequest\x1a\x17.bootstrap.ExitResponse\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -37,6 +37,10 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_JOINRESPONSE']._serialized_end=183
   _globals['_JOINRESPONSE_NODE']._serialized_start=151
   _globals['_JOINRESPONSE_NODE']._serialized_end=183
-  _globals['_BOOTSTRAP']._serialized_start=185
-  _globals['_BOOTSTRAP']._serialized_end=267
+  _globals['_EXITREQUEST']._serialized_start=185
+  _globals['_EXITREQUEST']._serialized_end=242
+  _globals['_EXITRESPONSE']._serialized_start=244
+  _globals['_EXITRESPONSE']._serialized_end=271
+  _globals['_BOOTSTRAP']._serialized_start=274
+  _globals['_BOOTSTRAP']._serialized_end=422
 # @@protoc_insertion_point(module_scope)
