@@ -15,12 +15,17 @@ class BootstrapServicer(bootstrap_pb2_grpc.BootstrapServicer):
         routing_table = [bootstrap_pb2.JoinResponse.Node(ip=_ip, port=_port) for _ip, _port in subnet]
         return bootstrap_pb2.JoinResponse(subnetId=subnet_id, subnet=routing_table)
     
-def BootstrapServe(ip):
+    def ExitNetwork(self, request, context):
+        print(f"Received exit announcement from peer ({request.ip}:{request.port}).")
+        peer_cache.remove_peer(request.ip, request.port, request.subnetId)
+        return bootstrap_pb2.ExitResponse(msg="Exit successful. See you again.")
+    
+def BootstrapServe():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     bootstrap_pb2_grpc.add_BootstrapServicer_to_server(BootstrapServicer(), server)
-    server.add_insecure_port(f"{ip}:{config.PORT + 1}")
+    server.add_insecure_port(f"{config.SERVER}:{config.PORT + 1}")
     server.start()
-    print(f"gRPC Bootstrap server running on {ip}:{config.PORT + 1}")
+    print(f"gRPC Bootstrap server running on {config.SERVER}:{config.PORT + 1}")
     try:
         server.wait_for_termination()
     except KeyboardInterrupt:
@@ -97,10 +102,7 @@ def start_server():
 # }
 
 if __name__ == "__main__":
-    command = "hostname -I"
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    ip = result.stdout.split(" ")[0]
-    BootstrapThread = threading.Thread(target=BootstrapServe, args=(ip,))
+    BootstrapThread = threading.Thread(target=BootstrapServe)
     BootstrapThread.start()
     try:
         BootstrapThread.join()
