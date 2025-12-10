@@ -26,7 +26,7 @@ class network_table:
         }
 
     def remove_peer(self, ip, port):
-        self.network_table.pop((ip, port), None)
+        self.network_table.pop((ip, port), "Can't find peer")
 
     def update_peer_last_seen(self, ip, port):
         if (ip, port) in self.network_table:
