@@ -63,14 +63,17 @@ def init_train_and_test_words(file_name, train_percent=0.8):
 
 import random
 
-def test_accuracy_bloom_filters(file_name, bloom_filter_class, capacity=10000, error_rate=0.01, train_percent=0.8):
+def test_accuracy_bloom_filters(file_name, bloom_filter_class, bf_object, train_percent=0.8):
     train_words, test_words = init_train_and_test_words(file_name, train_percent)
 
     # Initialize a fresh Bloom filter each iteration
-    bf = bloom_filter_class(capacity=capacity, error_rate=error_rate)
 
     for word in train_words:
-        bf.add(word)
+        bf_object.add(word)
+
+    if('Compact' in bloom_filter_class.__name__):
+        cm_bf_payload = data_processing_util.compact_bloom_serializer(bf_object)
+        bf_object.from_compacted((data_processing_util.compact_bloom_deserializer(cm_bf_payload))['cmBF'])
 
     train_set = set(train_words)  # faster membership check
 
@@ -80,7 +83,7 @@ def test_accuracy_bloom_filters(file_name, bloom_filter_class, capacity=10000, e
 
     for word in test_words:
         isAppear = word in train_set
-        bloom_answer = bf.is_available(word)
+        bloom_answer = bf_object.is_available(word)
 
         if bloom_answer == isAppear:
             correct_answer += 1
@@ -111,12 +114,6 @@ def test_time_init_bloom_filters(file_name, bloom_filter_class, capacity=10000, 
     print(f"{bloom_filter_class.__name__} init time: {init_duration:.6f} seconds")
 
 
-def test_memory_bloom_filters(file_name, bloom_filter_class, bloom_serializer, capacity=10000, error_rate=0.01, train_percent=1):
-    train_words, test_words = init_train_and_test_words(file_name, train_percent)
-
-    bf = bloom_filter_class(capacity, error_rate)
-    for word in train_words:
-        bf.add(word)
-
-    bf_transmit = bloom_serializer(bf)
+def test_memory_bloom_filters(bloom_filter_class, bf_object, bloom_serializer):
+    bf_transmit = bloom_serializer(bf_object)
     print(f"{bloom_filter_class.__name__} memory usage: {convert_bytes(len(bf_transmit))}")

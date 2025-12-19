@@ -1,5 +1,6 @@
 import json
 import zlib
+import bitarray
 class data_processing_util:
     @staticmethod
     def read_file(path: str):
@@ -20,11 +21,9 @@ class data_processing_util:
         bloom_state = {
             'capacity': bloom_filter.capacity,
             'error_rate': bloom_filter.error_rate,
-            'size': bloom_filter.size,
-            'hash_count': bloom_filter.hash_count,
-            'bit_array': bloom_filter.bit_array
+            'bit_array': bloom_filter.bit_array.to01()
         }
-        return json.dump(bloom_state).encode('utf-8')
+        return json.dumps(bloom_state).encode('utf-8')
     @staticmethod
     def bloom_deserializer(bloom_payload):
         '''
@@ -33,12 +32,40 @@ class data_processing_util:
                 bloom_state = {
                     'capacity': bloom_filter.capacity,
                     'error_rate': bloom_filter.error_rate,
-                    'size': bloom_filter.size,
-                    'hash_count': bloom_filter.hash_count,
                     'bit_array': bloom_filter.bit_array
                 }
         '''
-        return json.loads(bloom_payload.decode())
+        bloom_state = json.loads(bloom_payload.decode('utf-8'))
+        bloom_state['bit_array'] = bitarray(bloom_state['bit_array'])
+        return bloom_state
+    @staticmethod
+    def compact_bloom_serializer(cmBF) -> bytes:
+        '''
+        Serialize bloomfilter
+        input: Compact_BloomFilter object
+        return: abitrary bytes
+        '''
+        compact_bloom_state = {
+            'capacity': cmBF.capacity,
+            'error_rate': cmBF.error_rate,
+            'cmBF': cmBF.to_compacted()
+        }
+        return json.dumps(compact_bloom_state).encode('utf-8')
+    @staticmethod
+    def compact_bloom_deserializer(cmBF_payload):
+        '''
+        Deserialize bloomfilter
+        input: bytes
+        Return: 
+            compact_bloom_state = {
+                'capacity': cmBF.capacity,
+                'error_rate': cmBF.error_rate,
+                'cmBF': list of cmBF
+            }
+        '''
+        compact_bloom_state = json.loads(cmBF_payload.decode('utf-8'))
+        return compact_bloom_state
+
     @staticmethod
     def json_deserializer(json_bytes: bytes):
         json_str = json_bytes.decode() # From bytes to str
