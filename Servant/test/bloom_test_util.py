@@ -1,7 +1,7 @@
 import sys
 sys.path.append("../")
 from src.data_processing.data_processing import data_processing_util 
-
+from src.application.bloom import BloomFilter, KM_BloomFilter, Compact_BloomFilter, Compact_Refined_BloomFilter, Yes_No_BloomFilter
 import re
 import csv
 import random
@@ -48,10 +48,10 @@ def init_train_and_test_words(file_name, train_percent=0.8):
     train_words = words[:split_index]
     not_in_train = words[split_index:]
 
-    # 20% of not-in-train
+    # 10% of not-in-train
     test_from_not_train = random.sample(not_in_train, int(len(words) * ((1 - train_percent) / 2)))
 
-    # 20% of train
+    # 10% of train
     test_from_train = random.sample(train_words, int(len(words) * ((1 - train_percent) / 2)))
 
     # Combine
@@ -90,24 +90,45 @@ def test_accuracy_bloom_filters(file_name, bloom_filter_class, bf_object, train_
         else:
             if bloom_answer and not isAppear:
                 false_positives += 1
+                if(isinstance(bf_object, Yes_No_BloomFilter)):
+                    bf_object.add_false_positive(word)
             elif not bloom_answer and isAppear:
                 false_negatives += 1
 
     print(f"{bloom_filter_class.__name__} accuracy: {correct_answer/len(test_words):.4f}")
     print(f"False positives: {false_positives}, rate={false_positives/len(test_words):.4f}")
     print(f"False negatives: {false_negatives}, rate={false_negatives/len(test_words):.4f}")
+
+    if(isinstance(bf_object, Yes_No_BloomFilter)):
+        correct_answer = 0
+        false_positives = 0
+        false_negatives = 0
+        for word in test_words:
+            isAppear = word in train_set
+            bloom_answer = bf_object.is_available(word)
+
+            if bloom_answer == isAppear:
+                correct_answer += 1
+            else:
+                if bloom_answer and not isAppear:
+                    false_positives += 1
+                elif not bloom_answer and isAppear:
+                    false_negatives += 1
+
+        print(f"{bloom_filter_class.__name__} re-test accuracy: {correct_answer/len(test_words):.4f}")
+        print(f"False positives: {false_positives}, rate={false_positives/len(test_words):.4f}")
+        print(f"False negatives: {false_negatives}, rate={false_negatives/len(test_words):.4f}")
     print("--------------------------------------------------------")
 
 import time
 
-def test_time_init_bloom_filters(file_name, bloom_filter_class, capacity=10000, error_rate=0.01, train_percent=1):
+def test_time_init_bloom_filters(file_name, bloom_filter_class, bf_object, train_percent=1):
     train_words, test_words = init_train_and_test_words(file_name, train_percent)
 
     # Measure initialization time
     start_time = time.perf_counter()
-    bf = bloom_filter_class(capacity=capacity, error_rate=error_rate)
     for word in train_words:
-        bf.add(word)
+        bf_object.add(word)
     end_time = time.perf_counter()
 
     init_duration = end_time - start_time

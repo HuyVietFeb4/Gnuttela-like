@@ -37,12 +37,12 @@ class BloomFilter:
         k = (m / n) * math.log(2)
         return int(k)
 
-    def _get_hashes(self, item):
+    def _get_hashes(self, filename):
         """
             Original Bloom filter hashing:
             Generate k independent hash values using different hash functions or seeds.
         """
-        encoded = item.encode('utf-8')
+        encoded = filename.encode('utf-8')
 
         for i in range(self.hash_count):
             h = int(hashlib.sha256(encoded + str(i).encode('utf-8')).hexdigest(), 16)
@@ -72,12 +72,12 @@ class BloomFilter:
         self.bit_array.setall(0)
 
 class KM_BloomFilter(BloomFilter):
-    def _get_hashes(self, item):
+    def _get_hashes(self, filename):
         """
         Generates k hash values using Double Hashing (Kirsch-Mitzenmacher).
         We generate two large hashes and combine them to create k positions.
         """
-        encoded = item.encode('utf-8')
+        encoded = filename.encode('utf-8')
 
         # Use MD5 and SHA1 to get two independent hash integers
         h1 = int(hashlib.md5(encoded).hexdigest(), 16)
@@ -157,27 +157,71 @@ class Compact_Refined_BloomFilter(Compact_BloomFilter):
                     new_bits[j*block_size + i] = 1
         self.bit_array = new_bits
 
-'''
-In a P2P file sharing systems, the impact of false negative and false positive is as follow:
-- False negative: meaning that the file exists in the system but is flagged as not exists. In this case the bandwidth is reserve
-since there is no query to the peer that has the files.
-- False positive: meaning that the file does not exists in the system but is flagged as exists. In this case reliability is provided
-since it will guarantee to retrieve the file if it exists in the system. But the bandwidth will be wasted to the peer that flagged as
-has the file but do not actually have it.
+class Yes_No_BloomFilter(BloomFilter):
+    def __init__(self, capacity, error_rate=0.01, no_capacity=None, no_error_rate=0.01):
+        """
+        :param capacity: Expected number of filenames for yes-filter
+        :param error_rate: Desired false positive probability for yes-filter
+        :param no_capacity: Expected number of false positives to store in no-filter
+        :param no_error_rate: Desired false positive probability for no-filter
+        """
+        super().__init__(capacity, error_rate)
+        # Initialize the no-filter (smaller, separate Bloom filter)
+        if no_capacity is None:
+            no_capacity = int(capacity * 0.1)  # heuristic: 10% of yes capacity
+        self.no_capacity = no_capacity
+        self.no_error_rate = no_error_rate
+        self.no_size = self._get_size(no_capacity, self.no_error_rate)
+        self.no_hash_count = self._get_hash_count(self.no_size, self.no_capacity)
+        self.no_filter = bitarray.bitarray(self.no_size)
+        self.no_filter.setall(0)
 
-Categories that need to be considered to choose bloom filter:
-- Memory: To send over the network and reserve the bandwidth
-- False Positive and False Negative: FP < FN in term of bandwidth for the system and reverse for reliability
-- Deletion: Need to have delete feature to delete elements. Could introduce false negative but can reduce false positive
-- Frequency: There is no need to keep track of frequency of files in the system.
-- Adaptability: Can grow or adapt dynamically ? Could need for the app
-- Distance: How close is item to known set? (Cat is present, when query cot it will notify back that there are no cot but it close to some distance to cat) Interesting case to look into
-- Function value: What value is associated with item? (Like dictionary in python) Maybe also needed
-'''
-'''
-After implementing, the following categories will be used to choose the suitable bloom filter to the context:
-- Memory
-- Accuracy
-- Time
-- Context
-'''
+    def _get_no_hashes(self, filename):
+        """
+            No filter hashing:
+            Generate k independent hash values using different hash functions or seeds.
+        """
+        encoded = filename.encode('utf-8')
+
+        for i in range(self.no_hash_count):
+            h = int(hashlib.sha256(encoded + str(i).encode('utf-8')).hexdigest(), 16)
+            yield h % self.no_size
+
+    def add_false_positive(self, filename):
+        """
+        Add a known false positive to the no-filter.
+        This prevents it from being incorrectly reported as present.
+        """
+        for position in self._get_no_hashes(filename):
+            # Set the bit at 'position' to 1 using bitwise OR
+            self.no_filter[position] = 1
+    
+    def is_no_available(self, filename):
+        """
+        Checks if a filename is recorded in the no-filter (i.e., known false positive).
+        Returns True if the filename is PROBABLY recorded in the no-filter (all its hash bits set).
+        Returns False if the filename is DEFINITELY not recorded in the no-filter (at least one hash bit is 0).
+        """
+        for position in self._get_no_hashes(filename):
+            # Check if the bit at 'position' is 0
+            if not (self.no_filter[position]):
+                return False  
+        return True  
+
+    def is_available(self, filename):
+        """
+        Query the Yes-No Bloom Filter.
+        Returns:
+          - False if definitely not present
+          - False if present in yes-filter but also flagged in no-filter (false positive)
+          - True if probably present (yes-filter positive, no-filter negative)
+        """
+        # Step 1: check yes-filter
+        if not super().is_available(filename):
+            return False  # definitely not present
+
+        # Step 2: check no-filter
+        if self.is_no_available(filename):
+            return False  # known false positive
+
+        return True  # probably present
