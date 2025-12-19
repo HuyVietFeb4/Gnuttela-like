@@ -1,0 +1,122 @@
+import sys
+sys.path.append("../")
+from src.data_processing.data_processing import data_processing_util 
+
+import re
+import csv
+import random
+def create_keyword_list(filename: str):
+    filename = filename.lower()
+    filename = re.sub(r'[ .\-_]', ' ', filename)
+    pattern = r'[a-z0-9._\-()&\[\]+=,]+'
+    return re.findall(pattern, filename)
+
+def init_bf(files, bloom_filter):
+    '''
+        Breaks down a filename into keywords and adds them to the Bloom filter.
+    '''
+    for file in files:
+        keyword_list = create_keyword_list(file)
+        for keyword in keyword_list:
+            bloom_filter.add(keyword)
+
+def convert_bytes(size_in_bytes):
+    kb = size_in_bytes / 1024
+    mb = size_in_bytes / (1024 ** 2)
+    gb = size_in_bytes / (1024 ** 3)
+    return {
+        "B": size_in_bytes,
+        "KB": kb,
+        "MB": mb,
+        "GB": gb
+    } 
+
+import csv, random
+
+def init_train_and_test_words(file_name, train_percent=0.8):
+    words = []
+    with open(file_name, newline='', encoding='utf-8') as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader)  # skip header
+        for row in reader:
+            if row:
+                words.append(row[0])
+
+    random.shuffle(words)
+
+    split_index = int(len(words) * train_percent)
+    train_words = words[:split_index]
+    not_in_train = words[split_index:]
+
+    # 20% of not-in-train
+    test_from_not_train = random.sample(not_in_train, int(len(words) * ((1 - train_percent) / 2)))
+
+    # 20% of train
+    test_from_train = random.sample(train_words, int(len(words) * ((1 - train_percent) / 2)))
+
+    # Combine
+    test_words = test_from_not_train + test_from_train
+    random.shuffle(test_words)
+    random.shuffle(train_words)
+
+    return train_words, test_words
+
+import random
+
+def test_accuracy_bloom_filters(file_name, bloom_filter_class, capacity=10000, error_rate=0.01, train_percent=0.8):
+    train_words, test_words = init_train_and_test_words(file_name, train_percent)
+
+    # Initialize a fresh Bloom filter each iteration
+    bf = bloom_filter_class(capacity=capacity, error_rate=error_rate)
+
+    for word in train_words:
+        bf.add(word)
+
+    train_set = set(train_words)  # faster membership check
+
+    correct_answer = 0
+    false_positives = 0
+    false_negatives = 0
+
+    for word in test_words:
+        isAppear = word in train_set
+        bloom_answer = bf.is_available(word)
+
+        if bloom_answer == isAppear:
+            correct_answer += 1
+        else:
+            if bloom_answer and not isAppear:
+                false_positives += 1
+            elif not bloom_answer and isAppear:
+                false_negatives += 1
+
+    print(f"{bloom_filter_class.__name__} accuracy: {correct_answer/len(test_words):.4f}")
+    print(f"False positives: {false_positives}, rate={false_positives/len(test_words):.4f}")
+    print(f"False negatives: {false_negatives}, rate={false_negatives/len(test_words):.4f}")
+    print("--------------------------------------------------------")
+
+import time
+
+def test_time_init_bloom_filters(file_name, bloom_filter_class, capacity=10000, error_rate=0.01, train_percent=1):
+    train_words, test_words = init_train_and_test_words(file_name, train_percent)
+
+    # Measure initialization time
+    start_time = time.perf_counter()
+    bf = bloom_filter_class(capacity=capacity, error_rate=error_rate)
+    for word in train_words:
+        bf.add(word)
+    end_time = time.perf_counter()
+
+    init_duration = end_time - start_time
+    print(f"{bloom_filter_class.__name__} init time: {init_duration:.6f} seconds")
+
+
+def test_memory_bloom_filters(file_name, bloom_filter_class, bloom_serializer, capacity=10000, error_rate=0.01, train_percent=1):
+    train_words, test_words = init_train_and_test_words(file_name, train_percent)
+
+    bf = bloom_filter_class(capacity, error_rate)
+    for word in train_words:
+        bf.add(word)
+
+    bf_transmit = bloom_serializer(bf)
+    print(f"{bloom_filter_class.__name__} memory usage: {convert_bytes(len(bf_transmit))}")
