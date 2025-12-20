@@ -168,7 +168,7 @@ class Yes_No_BloomFilter(BloomFilter):
         super().__init__(capacity, error_rate)
         # Initialize the no-filter (smaller, separate Bloom filter)
         if no_capacity is None:
-            no_capacity = int(capacity * 0.1)  # heuristic: 10% of yes capacity
+            no_capacity = int(capacity * 0.2)  # heuristic: 10% of yes capacity
         self.no_capacity = no_capacity
         self.no_error_rate = no_error_rate
         self.no_size = self._get_size(no_capacity, self.no_error_rate)
@@ -225,3 +225,6 @@ class Yes_No_BloomFilter(BloomFilter):
             return False  # known false positive
 
         return True  # probably present
+    
+class KM_Compact_Refined_BloomFilter(KM_BloomFilter, Compact_Refined_BloomFilter):
+    pass
