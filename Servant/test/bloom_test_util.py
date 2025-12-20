@@ -48,11 +48,11 @@ def init_train_and_test_words(file_name, train_percent=0.8):
     train_words = words[:split_index]
     not_in_train = words[split_index:]
 
-    # 10% of not-in-train
-    test_from_not_train = random.sample(not_in_train, int(len(words) * ((1 - train_percent) / 2)))
+    # all of the not_in_train
+    test_from_not_train = not_in_train
 
-    # 10% of train
-    test_from_train = random.sample(train_words, int(len(words) * ((1 - train_percent) / 2)))
+    # 20% of train
+    test_from_train = random.sample(train_words, int(len(words) * (1 - train_percent)))
 
     # Combine
     test_words = test_from_not_train + test_from_train
@@ -118,7 +118,9 @@ def test_accuracy_bloom_filters(file_name, bloom_filter_class, bf_object, train_
         print(f"{bloom_filter_class.__name__} re-test accuracy: {correct_answer/len(test_words):.4f}")
         print(f"False positives: {false_positives}, rate={false_positives/len(test_words):.4f}")
         print(f"False negatives: {false_negatives}, rate={false_negatives/len(test_words):.4f}")
+        return correct_answer/len(test_words), false_positives/len(test_words), false_negatives/len(test_words)
     print("--------------------------------------------------------")
+    return correct_answer/len(test_words), false_positives/len(test_words), false_negatives/len(test_words)
 
 import time
 
