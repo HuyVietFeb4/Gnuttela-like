@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import Servant.src.transport.grpc_peer.peer_pb2 as peer__pb2
+from Servant.src.transport.grpc_peer import peer_pb2 as Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2
 
 GRPC_GENERATED_VERSION = '1.76.0'
 GRPC_VERSION = grpc.__version__
@@ -18,7 +18,7 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + ' but the generated code in peer_pb2_grpc.py depends on'
+        + ' but the generated code in Servant/src/transport/grpc_peer/peer_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
@@ -36,18 +36,23 @@ class PeerServiceStub(object):
         """
         self.Announce = channel.unary_unary(
                 '/peer.PeerService/Announce',
-                request_serializer=peer__pb2.NewPeerAddress.SerializeToString,
-                response_deserializer=peer__pb2.UltraPeerAddress.FromString,
+                request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.SerializeToString,
+                response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.FromString,
                 _registered_method=True)
         self.ElectLeader = channel.unary_unary(
                 '/peer.PeerService/ElectLeader',
-                request_serializer=peer__pb2.ElectionMsg.SerializeToString,
-                response_deserializer=peer__pb2.ElectionResponse.FromString,
+                request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.ElectionMsg.SerializeToString,
+                response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
                 _registered_method=True)
         self.ExitNetwork = channel.unary_unary(
                 '/peer.PeerService/ExitNetwork',
-                request_serializer=peer__pb2.NewPeerAddress.SerializeToString,
-                response_deserializer=peer__pb2.ExitResponse.FromString,
+                request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.SerializeToString,
+                response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
+                _registered_method=True)
+        self.PingBloom = channel.unary_unary(
+                '/peer.PeerService/PingBloom',
+                request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.BloomFilter.SerializeToString,
+                response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
                 _registered_method=True)
 
 
@@ -72,23 +77,34 @@ class PeerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def PingBloom(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_PeerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Announce': grpc.unary_unary_rpc_method_handler(
                     servicer.Announce,
-                    request_deserializer=peer__pb2.NewPeerAddress.FromString,
-                    response_serializer=peer__pb2.UltraPeerAddress.SerializeToString,
+                    request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.FromString,
+                    response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.SerializeToString,
             ),
             'ElectLeader': grpc.unary_unary_rpc_method_handler(
                     servicer.ElectLeader,
-                    request_deserializer=peer__pb2.ElectionMsg.FromString,
-                    response_serializer=peer__pb2.ElectionResponse.SerializeToString,
+                    request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.ElectionMsg.FromString,
+                    response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.SerializeToString,
             ),
             'ExitNetwork': grpc.unary_unary_rpc_method_handler(
                     servicer.ExitNetwork,
-                    request_deserializer=peer__pb2.NewPeerAddress.FromString,
-                    response_serializer=peer__pb2.ExitResponse.SerializeToString,
+                    request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.FromString,
+                    response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.SerializeToString,
+            ),
+            'PingBloom': grpc.unary_unary_rpc_method_handler(
+                    servicer.PingBloom,
+                    request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.BloomFilter.FromString,
+                    response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -116,8 +132,8 @@ class PeerService(object):
             request,
             target,
             '/peer.PeerService/Announce',
-            peer__pb2.NewPeerAddress.SerializeToString,
-            peer__pb2.UltraPeerAddress.FromString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.SerializeToString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.FromString,
             options,
             channel_credentials,
             insecure,
@@ -143,8 +159,8 @@ class PeerService(object):
             request,
             target,
             '/peer.PeerService/ElectLeader',
-            peer__pb2.ElectionMsg.SerializeToString,
-            peer__pb2.ElectionResponse.FromString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.ElectionMsg.SerializeToString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
             options,
             channel_credentials,
             insecure,
@@ -170,8 +186,35 @@ class PeerService(object):
             request,
             target,
             '/peer.PeerService/ExitNetwork',
-            peer__pb2.NewPeerAddress.SerializeToString,
-            peer__pb2.ExitResponse.FromString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.SerializeToString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def PingBloom(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/peer.PeerService/PingBloom',
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.BloomFilter.SerializeToString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
             options,
             channel_credentials,
             insecure,
