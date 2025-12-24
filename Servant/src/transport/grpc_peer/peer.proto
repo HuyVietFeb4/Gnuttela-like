@@ -2,29 +2,26 @@ syntax = "proto3";
 package peer;
 
 service PeerService {
-    rpc Announce (NewPeerAddress) returns (UltraPeerAddress) {}
-    rpc ElectLeader (ElectionMsg) returns (ElectionResponse) {}
-    rpc ExitNetwork (NewPeerAddress) returns (ExitResponse) {}
+    rpc Announce (PeerAddress) returns (PeerAddress) {}
+    rpc ElectLeader (ElectionMsg) returns (Response) {}
+    rpc ExitNetwork (PeerAddress) returns (Response) {}
+    rpc PingBloom (BloomFilter) returns (Response) {}
 }
 
 message ElectionMsg {
     bytes id = 1;
 }
 
-message ElectionResponse {
+message Response {
     string msg = 1;
 }
 
-message NewPeerAddress {
+message PeerAddress {
     string ip = 1;
     int32 port = 2;
 }
 
-message UltraPeerAddress {
-    string ip = 1;
-    int32 port = 2;
-}
-
-message ExitResponse {
-    string msg = 1;
+message BloomFilter {
+    PeerAddress address = 1;
+    bytes bloom = 2;
 }
