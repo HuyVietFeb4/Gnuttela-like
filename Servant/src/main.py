@@ -1,23 +1,28 @@
-import grpc, threading, sys
+import grpc, threading, sys, os, subprocess, platform
 from concurrent import futures
+from pathlib import Path
 
 from Servant.src.application.leaf_peer import Peer
 from Servant.src.application.ultra_peer import UltraPeer
-from Servant.src.application.bloom import BloomFilter
+from Servant.src.application.bloom import KM_Compact_Refined_BloomFilter
 from Servant.config import peer_settings
 from Servant.src.transport.network_table import network_table
 from Host_cache_server import config
+from Servant.src.data_processing.data_processing import data_processing_util
+from Servant.src.transport.bloom_table import bloom_table
+from Servant.test.bloom_test_util import create_keyword_list
 
 from Host_cache_server.grpc_bootstrap import bootstrap_pb2
 from Host_cache_server.grpc_bootstrap import bootstrap_pb2_grpc
 from Servant.src.transport.grpc_peer import peer_pb2
 from Servant.src.transport.grpc_peer import peer_pb2_grpc
 
+
 def request_bootstrap():
     """
     gRPC client call for request_bootstrap
     """
-    with grpc.insecure_channel(f"{"192.168.1.6"}:{config.PORT + 1}") as channel:
+    with grpc.insecure_channel(f"{config.SERVER}:{config.PORT + 1}") as channel:
         stub = bootstrap_pb2_grpc.BootstrapStub(channel)
         try:
             response = stub.RequestBootstrap(bootstrap_pb2.JoinRequest(ip=peer_settings.HOST, port=peer_settings.PORT))
@@ -40,7 +45,7 @@ class PeerServiceServicer(peer_pb2_grpc.PeerServiceServicer):
         print(f"Received join announcement from leaf peer ({request.ip}:{request.port}).")
         self.peer.network_table.add_peer(request.ip, request.port, True)
         ultra_ip, ultra_port = self.peer.network_table.get_ultra_peer()
-        return peer_pb2.UltraPeerAddress(ip=ultra_ip, port=ultra_port)
+        return peer_pb2.PeerAddress(ip=ultra_ip, port=ultra_port)
 
     def ElectLeader(self, request, context):
         return super().ElectLeader(request, context)
@@ -48,7 +53,21 @@ class PeerServiceServicer(peer_pb2_grpc.PeerServiceServicer):
     def ExitNetwork(self, request, context):
         print(f"Received exit announcement from peer ({request.ip}:{request.port}).")
         self.peer.network_table.remove_peer(request.ip, request.port)
-        return peer_pb2.ExitResponse(msg="Exit successful. See you again.")
+        self.peer.bloom_table.remove_bloom(request.ip, request.port)
+        return peer_pb2.Response(msg="Exit successful. See you again.")
+    
+    def PingBloom(self, request, context):
+        peer_ip, peer_port = request.address.ip, request.address.port
+        address = (peer_ip, peer_port)
+        print(f"Received bloom filter from peer ({peer_ip}:{peer_port}).")
+        if address in self.peer.bloom_table.bloom_table:
+            self.peer.bloom_table.bloom_table[address].from_compacted((data_processing_util.compact_bloom_deserializer(request.bloom))['cmBF'])
+        else:
+            self.peer.bloom_table.bloom_table[address] = KM_Compact_Refined_BloomFilter(peer_settings.FILE_CAPACITY)
+            self.peer.bloom_table.bloom_table[address].from_compacted((data_processing_util.compact_bloom_deserializer(request.bloom))['cmBF'])
+
+        print(self.peer.bloom_table.bloom_table)
+        return peer_pb2.Response(msg="Received bloom filter successfully.")
 
 def PeerServe(server_ip, server_port, peer):
     """
@@ -82,7 +101,7 @@ def announce_new_peer(server_ip, server_port):
     with grpc.insecure_channel(f"{server_ip}:{server_port + 1}") as channel:
         stub = peer_pb2_grpc.PeerServiceStub(channel)
         try:
-            response = stub.Announce(peer_pb2.NewPeerAddress(ip=peer_settings.HOST, port=peer_settings.PORT))
+            response = stub.Announce(peer_pb2.PeerAddress(ip=peer_settings.HOST, port=peer_settings.PORT))
             print(f"Peer ({server_ip}:{server_port}) response:\nUltra peer address: ({response.ip}:{response.port})")
             return response.ip, response.port
         except grpc.RpcError as e:
@@ -106,7 +125,7 @@ def prompt_for_file(server, peer):
                 sys.exit(0)
 
             if filename:
-                find_file(filename)
+                find_file(filename, peer)
                 
         except EOFError:
             print("\nInput stream closed. Initiating server shutdown...")
@@ -116,8 +135,42 @@ def prompt_for_file(server, peer):
         except KeyboardInterrupt:
             break
 
-def find_file(filename):
-    pass
+def ping_bloom_filter(peer):
+    """
+    Ping bloom filter on update to ultra node
+
+    :bloom: serialized bloom filter
+    """
+    ultra = peer.network_table.get_ultra_peer()
+    with grpc.insecure_channel(f"{ultra[0]}:{ultra[1] + 1}") as channel:
+        stub = peer_pb2_grpc.PeerServiceStub(channel)
+        try:
+            response = stub.PingBloom(peer_pb2.BloomFilter(address=peer_pb2.PeerAddress(ip=peer_settings.HOST, port=peer_settings.PORT), bloom=data_processing_util.compact_bloom_serializer(peer.bloom_filter)))
+            print(f"Ultra ({ultra[0]}:{ultra[1]}) response: {response.msg}")
+        except grpc.RpcError as e:
+            print("Synchronization failed:", e.code(), e.details())
+
+def find_file(filename, peer):
+    if peer.bloom_filter.is_available(filename):
+        if filename in peer.files:
+            open_file_in_default_app(os.path.join(peer.directory, filename))
+            return
+    
+    
+
+def open_file_in_default_app(filepath):
+    """
+    Opens a file using the OS's default application.
+    
+    :param filepath: path of file to open
+    """
+    if platform.system() == "Windows":
+        os.startfile(filepath)
+    elif platform.system() == "Darwin":
+        subprocess.run(["open", filepath])
+    else:
+        subprocess.run(["xdg-open", filepath])
+
 
 def exit_network(server_ip, server_port, subnet_id=None):
     """
@@ -130,7 +183,7 @@ def exit_network(server_ip, server_port, subnet_id=None):
     with grpc.insecure_channel(f"{server_ip}:{server_port + 1}") as channel:
         stub = peer_pb2_grpc.PeerServiceStub(channel) if subnet_id is None else bootstrap_pb2_grpc.BootstrapStub(channel)
         try:
-            response = stub.ExitNetwork(peer_pb2.NewPeerAddress(ip=peer_settings.HOST, port=peer_settings.PORT)) if subnet_id is None else stub.ExitNetwork(bootstrap_pb2.ExitRequest(ip=peer_settings.HOST, port=peer_settings.PORT, subnetId=subnet_id))
+            response = stub.ExitNetwork(peer_pb2.PeerAddress(ip=peer_settings.HOST, port=peer_settings.PORT)) if subnet_id is None else stub.ExitNetwork(bootstrap_pb2.ExitRequest(ip=peer_settings.HOST, port=peer_settings.PORT, subnetId=subnet_id))
             print(f"({server_ip}:{server_port}) response: {response.msg}")
         except grpc.RpcError as e:
             print("Exit network failed:", e.code(), e.details())
@@ -150,14 +203,19 @@ if "__main__" == __name__:
     else:
         [peer.network_table.add_peer(node.ip, node.port, True) for node in result.subnet]
     
-    peer.bloom_filter = BloomFilter(peer_settings.FILE_CAPACITY)
-    [peer.bloom_filter.add(filename) for filename in peer_settings.FILES]
-    
+    peer.directory = Path(__file__).parent.parent / "files"
+    peer.bloom_filter = KM_Compact_Refined_BloomFilter(peer_settings.FILE_CAPACITY)
+    [peer.bloom_filter.add(keyword) for filename in peer.all_files() for keyword in create_keyword_list(filename)]
+
     # Announce new peer with other peers
     if peer.__class__ == Peer:
         for node in peer.network_table.get_peers_addresses():
             ultra_ip, ultra_port = announce_new_peer(node[0], node[1])
             peer.network_table.update_peer_role(ultra_ip, ultra_port, False)
+
+        ping_bloom_filter(peer)
+    else:
+        peer.bloom_table = bloom_table((peer_settings.HOST, peer_settings.PORT), peer.bloom_filter)
     
     # Run PeerService server
     PeerServiceThread = threading.Thread(target=PeerServe, args=(peer_settings.HOST, peer_settings.PORT, peer))
