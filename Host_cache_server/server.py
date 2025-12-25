@@ -1,4 +1,4 @@
-import socket, selectors, grpc, threading, subprocess
+import socket, selectors, grpc, threading, json
 from concurrent import futures
 
 from Host_cache_server import protocol, peer_cache, config
@@ -7,25 +7,33 @@ from Host_cache_server.grpc_bootstrap import bootstrap_pb2
 
 selector = selectors.DefaultSelector()
 
-# gRPC Boostrap server run on port + 1
+# gRPC Boostrap server run on port
 class BootstrapServicer(bootstrap_pb2_grpc.BootstrapServicer):
     def RequestBootstrap(self, request, context):
-        print(f"Received bootstrap request from peer ({request.ip}:{request.port})")
-        subnet_id, subnet = peer_cache.add_peer(request.ip, request.port)
-        routing_table = [bootstrap_pb2.JoinResponse.Node(ip=_ip, port=_port) for _ip, _port in subnet]
-        return bootstrap_pb2.JoinResponse(subnetId=subnet_id, subnet=routing_table)
+        ip = request.peer.ip
+        port = request.peer.port
+        print(f"Received bootstrap request from peer ({ip}:{port})")
+        subnet_id, subnet = peer_cache.add_peer(ip, port)
+        routing_table = [bootstrap_pb2.PeerAddress(ip=_ip, port=_port) for _ip, _port in subnet]
+        return bootstrap_pb2.JoinResponse(subnet_id=subnet_id, subnet=routing_table)
     
     def ExitNetwork(self, request, context):
-        print(f"Received exit announcement from peer ({request.ip}:{request.port}).")
-        peer_cache.remove_peer(request.ip, request.port, request.subnetId)
+        ip = request.peer.ip
+        port = request.peer.port
+        print(f"Received exit announcement from peer ({ip}:{port}).")
+        peer_cache.remove_peer(ip, port, request.subnet_id)
         return bootstrap_pb2.ExitResponse(msg="Exit successful. See you again.")
+    
+    def GetUltras(self, request, context):
+        print(f"Received request to get ultra list from ({request.peer.ip}:{request.peer.port})")
+        return bootstrap_pb2.UltrasResponse(nodes=json.dumps(peer_cache.ultra_peers).encode('utf-8'))
     
 def BootstrapServe():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     bootstrap_pb2_grpc.add_BootstrapServicer_to_server(BootstrapServicer(), server)
-    server.add_insecure_port(f"{config.SERVER}:{config.PORT + 1}")
+    server.add_insecure_port(f"{config.SERVER}:{config.PORT}")
     server.start()
-    print(f"gRPC Bootstrap server running on {config.SERVER}:{config.PORT + 1}")
+    print(f"gRPC Bootstrap server running on {config.SERVER}:{config.PORT}")
     try:
         server.wait_for_termination()
     except KeyboardInterrupt:
