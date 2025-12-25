@@ -16,7 +16,7 @@ from Host_cache_server.grpc_bootstrap import bootstrap_pb2_grpc
 def smart_print(*args, **kwargs):
     msg = " ".join(map(str, args))
     sys.stdout.write(f"\r\033[K{msg}\n")
-    sys.stdout.write("Enter the file name you want (or type 'quit' to exit server): ")
+    sys.stdout.write("\nEnter the file name you want (or type 'quit' to exit server): ")
     sys.stdout.flush()
 
 builtins.print = smart_print
@@ -57,7 +57,7 @@ if "__main__" == __name__:
 
     # Announce new peer with other peers
     if peer.__class__ == Peer:
-        for node in peer.network_table.get_peers_addresses():
+        for node in peer.network_table.get_peers_addresses(peer.ip, peer.port):
             ultra_ip, ultra_port = peer.announce_new_peer(node[0], node[1])
             peer.network_table.update_peer_role(ultra_ip, ultra_port, False)
 
