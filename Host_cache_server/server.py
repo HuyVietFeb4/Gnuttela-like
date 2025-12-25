@@ -22,11 +22,18 @@ class BootstrapServicer(bootstrap_pb2_grpc.BootstrapServicer):
         port = request.peer.port
         print(f"Received exit announcement from peer ({ip}:{port}).")
         peer_cache.remove_peer(ip, port, request.subnet_id)
-        return bootstrap_pb2.ExitResponse(msg="Exit successful. See you again.")
+        return bootstrap_pb2.Response(msg="Exit successful. See you again.")
     
     def GetUltras(self, request, context):
         print(f"Received request to get ultra list from ({request.peer.ip}:{request.peer.port})")
         return bootstrap_pb2.UltrasResponse(nodes=json.dumps(peer_cache.ultra_peers).encode('utf-8'))
+    
+    def NewUltra(self, request, context):
+        ip = request.peer.ip
+        port = request.peer.port
+        print(f"Received request to update ultra from ({ip}:{port})")
+        peer_cache.add_ultra_peer(ip, port, request.id)
+        return bootstrap_pb2.Response(msg="Assign new ultra successul.")
     
 def BootstrapServe():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
