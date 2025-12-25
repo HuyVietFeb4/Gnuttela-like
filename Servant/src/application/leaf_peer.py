@@ -29,9 +29,16 @@ class PeerServiceServicer(peer_pb2_grpc.PeerServiceServicer):
         return super().ElectLeader(request, context)
     
     def ExitNetwork(self, request, context):
-        print(f"Received exit announcement from peer ({request.ip}:{request.port}).")
-        self.peer.network_table.remove_peer(request.ip, request.port)
-        self.peer.bloom_table.remove_bloom(request.ip, request.port)
+        ip, port = request.ip, request.port
+        ultra = self.peer.network_table.get_ultra_peer()
+        print(f"Received exit announcement from peer ({ip}:{port}).")
+        self.peer.network_table.remove_peer(ip, port)
+        if self.peer.__class__ != Peer:
+            self.peer.bloom_table.remove_bloom(ip, port)
+        if (ip, port) == ultra:
+            LeaderElectionThread = threading.Thread(target=self.peer.leader_election)
+            LeaderElectionThread.daemon = True
+            LeaderElectionThread.start()
         return peer_pb2.Response(msg="Exit successful. See you again.")
     
     def PingBloom(self, request, context):
@@ -57,6 +64,7 @@ class PeerServiceServicer(peer_pb2_grpc.PeerServiceServicer):
     
     def QueryEach(self, request, context):
         keyword = request.keyword
+        print(f"Received file query: {keyword}")
         files = [filename for filename in self.peer.all_files() if keyword.lower() in filename.lower()]
         return peer_pb2.Files(file_list=files)
     
@@ -76,6 +84,22 @@ class PeerServiceServicer(peer_pb2_grpc.PeerServiceServicer):
             print(f"Error: You do not have permission to read '{filepath}'.")
         except OSError as e:
             print(f"A system error occurred: {e}")
+
+    def Bully(self, request, context):
+        ip, port = request.peer.ip, request.peer.port
+        print(f"Received bully message from peer ({ip}:{port}).")
+        if self.peer.id < request.id:
+            return peer_pb2.Response(msg="OK")
+        return peer_pb2.Response(msg="NO")
+    
+    def LeaderElection(self, request, context):
+        ip, port = request.ip, request.port
+        print(f"Received request from new ultra peer ({ip}:{port}).")
+        self.peer.network_table.update_peer_role(ip, port, False)
+        PingBloomThread = threading.Thread(target=self.peer.ping_bloom_filter)
+        PingBloomThread.daemon = True
+        PingBloomThread.start()
+        return peer_pb2.Response(msg="New ultra accepted.")
 
 class Peer:
     def __init__(self, ip, port, bloom_filter=None, network_table=None, subnet_id=None, directory=None):
@@ -155,7 +179,7 @@ class Peer:
                 keyword = input("\nEnter the file name you want (or type 'quit' to exit server): ")
                 if keyword.lower() == 'quit':
                     print("\nInitiating server shutdown...")
-                    [self.exit_network(node[0], node[1]) for node in self.network_table.get_peers_addresses()]
+                    [self.exit_network(node[0], node[1]) for node in self.network_table.get_peers_addresses(self.ip, self.port)]
                     self.exit_network(config.SERVER, config.PORT, self.subnet_id)
                     server.stop(grace=5)
                     sys.exit(0)
@@ -217,8 +241,43 @@ class Peer:
             except grpc.RpcError as e:
                 print("Query hit failed:", e.code(), e.details())
 
-    def push(self):
-        pass
+    def leader_election(self):
+        ok_count = 0
+        peers = self.network_table.get_peers_addresses(self.ip, self.port)
+        for address in peers:
+            with grpc.insecure_channel(f"{address[0]}:{address[1]}") as channel:
+                stub = peer_pb2_grpc.PeerServiceStub(channel)
+                try:
+                    response = stub.Bully(peer_pb2.BullyRequest(peer=peer_pb2.PeerAddress(ip=self.ip, port=self.port), id=self.id))
+                    msg = response.msg
+                    print(f"({address[0]}:{address[1]}) response: {msg}")
+                    if msg == "OK":
+                        ok_count += 1
+                except grpc.RpcError as e:
+                    print("Bully failed:", e.code(), e.details())
+
+        if ok_count == len(peers):
+            self.network_table.update_peer_role(self.ip, self.port, False)
+            from Servant.src.application.ultra_peer import UltraPeer
+            from Servant.src.transport.bloom_table import bloom_table
+            self.__class__ = UltraPeer
+            self.bloom_table = bloom_table((self.ip, self.port), self.bloom_filter)
+            for address in peers:
+                with grpc.insecure_channel(f"{address[0]}:{address[1]}") as channel:
+                    stub = peer_pb2_grpc.PeerServiceStub(channel)
+                    try:
+                        response = stub.LeaderElection(peer_pb2.PeerAddress(ip=self.ip, port=self.port))
+                        print(f"({address[0]}:{address[1]}) response: {response.msg}")
+                    except grpc.RpcError as e:
+                        print("Leader election failed:", e.code(), e.details())
+
+            with grpc.insecure_channel(f"{config.SERVER}:{config.PORT}") as channel:
+                stub = bootstrap_pb2_grpc.BootstrapStub(channel)
+                try:
+                    response = stub.NewUltra(bootstrap_pb2.NewUltraRequest(peer=bootstrap_pb2.PeerAddress(ip=self.ip, port=self.port), id=self.subnet_id))
+                    print(f"({config.SERVER}:{config.PORT}) response: {response.msg}")
+                except grpc.RpcError as e:
+                    print("New ultra failed:", e.code(), e.details())
 
     def exit_network(self, server_ip, server_port, subnet_id=None):
         """
