@@ -54,6 +54,26 @@ class PeerServiceStub(object):
                 request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.BloomFilter.SerializeToString,
                 response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
                 _registered_method=True)
+        self.QueryFile = channel.unary_unary(
+                '/peer.PeerService/QueryFile',
+                request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Query.SerializeToString,
+                response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.QueryResult.FromString,
+                _registered_method=True)
+        self.QuerySelf = channel.unary_unary(
+                '/peer.PeerService/QuerySelf',
+                request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Query.SerializeToString,
+                response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.QueryResult.FromString,
+                _registered_method=True)
+        self.QueryEach = channel.unary_unary(
+                '/peer.PeerService/QueryEach',
+                request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Query.SerializeToString,
+                response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Files.FromString,
+                _registered_method=True)
+        self.DownloadFile = channel.unary_stream(
+                '/peer.PeerService/DownloadFile',
+                request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.FileName.SerializeToString,
+                response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Chunk.FromString,
+                _registered_method=True)
 
 
 class PeerServiceServicer(object):
@@ -83,6 +103,30 @@ class PeerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def QueryFile(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def QuerySelf(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def QueryEach(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DownloadFile(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_PeerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -105,6 +149,26 @@ def add_PeerServiceServicer_to_server(servicer, server):
                     servicer.PingBloom,
                     request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.BloomFilter.FromString,
                     response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.SerializeToString,
+            ),
+            'QueryFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.QueryFile,
+                    request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Query.FromString,
+                    response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.QueryResult.SerializeToString,
+            ),
+            'QuerySelf': grpc.unary_unary_rpc_method_handler(
+                    servicer.QuerySelf,
+                    request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Query.FromString,
+                    response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.QueryResult.SerializeToString,
+            ),
+            'QueryEach': grpc.unary_unary_rpc_method_handler(
+                    servicer.QueryEach,
+                    request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Query.FromString,
+                    response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Files.SerializeToString,
+            ),
+            'DownloadFile': grpc.unary_stream_rpc_method_handler(
+                    servicer.DownloadFile,
+                    request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.FileName.FromString,
+                    response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Chunk.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -215,6 +279,114 @@ class PeerService(object):
             '/peer.PeerService/PingBloom',
             Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.BloomFilter.SerializeToString,
             Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def QueryFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/peer.PeerService/QueryFile',
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Query.SerializeToString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.QueryResult.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def QuerySelf(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/peer.PeerService/QuerySelf',
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Query.SerializeToString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.QueryResult.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def QueryEach(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/peer.PeerService/QueryEach',
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Query.SerializeToString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Files.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def DownloadFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(
+            request,
+            target,
+            '/peer.PeerService/DownloadFile',
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.FileName.SerializeToString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Chunk.FromString,
             options,
             channel_credentials,
             insecure,

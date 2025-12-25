@@ -6,6 +6,10 @@ service PeerService {
     rpc ElectLeader (ElectionMsg) returns (Response) {}
     rpc ExitNetwork (PeerAddress) returns (Response) {}
     rpc PingBloom (BloomFilter) returns (Response) {}
+    rpc QueryFile (Query) returns (QueryResult) {}
+    rpc QuerySelf (Query) returns (QueryResult) {}
+    rpc QueryEach (Query) returns (Files) {}
+    rpc DownloadFile (FileName) returns (stream Chunk) {}
 }
 
 message ElectionMsg {
@@ -24,4 +28,24 @@ message PeerAddress {
 message BloomFilter {
     PeerAddress address = 1;
     bytes bloom = 2;
+}
+
+message Query {
+    string keyword = 1;
+}
+
+message QueryResult {
+    bytes files = 1;
+}
+
+message Files {
+    repeated string file_list = 1;
+}
+
+message FileName {
+    string file = 1;
+}
+
+message Chunk {
+    bytes buffer = 1;
 }
