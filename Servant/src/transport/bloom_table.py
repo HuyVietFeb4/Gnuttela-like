@@ -14,16 +14,8 @@ class bloom_table:
     def __init__(self, self_address, self_bloom): # Since ultra peer is an extension of peer, it must include at least it bloom filter data
         self.bloom_table = {self_address: {"bloom_filter": self_bloom}}
 
-    def file_request(self, filename):
-        '''
-            Iterate through each peer and check if there is, return list of peer that pressumely have it
-        '''
-        peer_result = []
-        for address, info in self.bloom_table.items():
-            if info['bloom_filter'].checksumshi(filename):
-                peer_result.append(address)
-
-        return peer_result
-
     def remove_bloom(self, ip, port):
         self.bloom_table.pop((ip, port), "Can't find bloom")
+
+    def query(self, keyword):
+        return [address for address, bloom in self.bloom_table.items() if bloom["bloom_filter"].is_available(keyword)]
