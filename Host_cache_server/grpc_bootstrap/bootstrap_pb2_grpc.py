@@ -42,12 +42,17 @@ class BootstrapStub(object):
         self.ExitNetwork = channel.unary_unary(
                 '/bootstrap.Bootstrap/ExitNetwork',
                 request_serializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.ExitRequest.SerializeToString,
-                response_deserializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.ExitResponse.FromString,
+                response_deserializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.Response.FromString,
                 _registered_method=True)
         self.GetUltras = channel.unary_unary(
                 '/bootstrap.Bootstrap/GetUltras',
                 request_serializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.RequestUltras.SerializeToString,
                 response_deserializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.UltrasResponse.FromString,
+                _registered_method=True)
+        self.NewUltra = channel.unary_unary(
+                '/bootstrap.Bootstrap/NewUltra',
+                request_serializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.NewUltraRequest.SerializeToString,
+                response_deserializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.Response.FromString,
                 _registered_method=True)
 
 
@@ -72,6 +77,12 @@ class BootstrapServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def NewUltra(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_BootstrapServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -83,12 +94,17 @@ def add_BootstrapServicer_to_server(servicer, server):
             'ExitNetwork': grpc.unary_unary_rpc_method_handler(
                     servicer.ExitNetwork,
                     request_deserializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.ExitRequest.FromString,
-                    response_serializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.ExitResponse.SerializeToString,
+                    response_serializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.Response.SerializeToString,
             ),
             'GetUltras': grpc.unary_unary_rpc_method_handler(
                     servicer.GetUltras,
                     request_deserializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.RequestUltras.FromString,
                     response_serializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.UltrasResponse.SerializeToString,
+            ),
+            'NewUltra': grpc.unary_unary_rpc_method_handler(
+                    servicer.NewUltra,
+                    request_deserializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.NewUltraRequest.FromString,
+                    response_serializer=Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.Response.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -144,7 +160,7 @@ class Bootstrap(object):
             target,
             '/bootstrap.Bootstrap/ExitNetwork',
             Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.ExitRequest.SerializeToString,
-            Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.ExitResponse.FromString,
+            Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.Response.FromString,
             options,
             channel_credentials,
             insecure,
@@ -172,6 +188,33 @@ class Bootstrap(object):
             '/bootstrap.Bootstrap/GetUltras',
             Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.RequestUltras.SerializeToString,
             Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.UltrasResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def NewUltra(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/bootstrap.Bootstrap/NewUltra',
+            Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.NewUltraRequest.SerializeToString,
+            Host__cache__server_dot_grpc__bootstrap_dot_bootstrap__pb2.Response.FromString,
             options,
             channel_credentials,
             insecure,

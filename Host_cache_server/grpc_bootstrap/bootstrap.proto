@@ -3,8 +3,9 @@ package bootstrap;
 
 service Bootstrap {
     rpc RequestBootstrap (JoinRequest) returns (JoinResponse) {}
-    rpc ExitNetwork (ExitRequest) returns (ExitResponse) {}
+    rpc ExitNetwork (ExitRequest) returns (Response) {}
     rpc GetUltras (RequestUltras) returns (UltrasResponse) {}
+    rpc NewUltra (NewUltraRequest) returns (Response) {}
 }
 
 message PeerAddress {
@@ -26,7 +27,7 @@ message ExitRequest {
     int32 subnet_id = 2;
 }
 
-message ExitResponse {
+message Response {
     string msg = 1;
 }
 
@@ -36,4 +37,9 @@ message RequestUltras {
 
 message UltrasResponse {
     bytes nodes = 1;
+}
+
+message NewUltraRequest {
+    PeerAddress peer = 1;
+    int32 id = 2;
 }

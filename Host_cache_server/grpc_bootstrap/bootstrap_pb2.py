@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n0Host_cache_server/grpc_bootstrap/bootstrap.proto\x12\tbootstrap\"\'\n\x0bPeerAddress\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"3\n\x0bJoinRequest\x12$\n\x04peer\x18\x01 \x01(\x0b\x32\x16.bootstrap.PeerAddress\"I\n\x0cJoinResponse\x12\x11\n\tsubnet_id\x18\x01 \x01(\x05\x12&\n\x06subnet\x18\x02 \x03(\x0b\x32\x16.bootstrap.PeerAddress\"F\n\x0b\x45xitRequest\x12$\n\x04peer\x18\x01 \x01(\x0b\x32\x16.bootstrap.PeerAddress\x12\x11\n\tsubnet_id\x18\x02 \x01(\x05\"\x1b\n\x0c\x45xitResponse\x12\x0b\n\x03msg\x18\x01 \x01(\t\"5\n\rRequestUltras\x12$\n\x04peer\x18\x01 \x01(\x0b\x32\x16.bootstrap.PeerAddress\"\x1f\n\x0eUltrasResponse\x12\r\n\x05nodes\x18\x01 \x01(\x0c\x32\xd8\x01\n\tBootstrap\x12\x45\n\x10RequestBootstrap\x12\x16.bootstrap.JoinRequest\x1a\x17.bootstrap.JoinResponse\"\x00\x12@\n\x0b\x45xitNetwork\x12\x16.bootstrap.ExitRequest\x1a\x17.bootstrap.ExitResponse\"\x00\x12\x42\n\tGetUltras\x12\x18.bootstrap.RequestUltras\x1a\x19.bootstrap.UltrasResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n0Host_cache_server/grpc_bootstrap/bootstrap.proto\x12\tbootstrap\"\'\n\x0bPeerAddress\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"3\n\x0bJoinRequest\x12$\n\x04peer\x18\x01 \x01(\x0b\x32\x16.bootstrap.PeerAddress\"I\n\x0cJoinResponse\x12\x11\n\tsubnet_id\x18\x01 \x01(\x05\x12&\n\x06subnet\x18\x02 \x03(\x0b\x32\x16.bootstrap.PeerAddress\"F\n\x0b\x45xitRequest\x12$\n\x04peer\x18\x01 \x01(\x0b\x32\x16.bootstrap.PeerAddress\x12\x11\n\tsubnet_id\x18\x02 \x01(\x05\"\x17\n\x08Response\x12\x0b\n\x03msg\x18\x01 \x01(\t\"5\n\rRequestUltras\x12$\n\x04peer\x18\x01 \x01(\x0b\x32\x16.bootstrap.PeerAddress\"\x1f\n\x0eUltrasResponse\x12\r\n\x05nodes\x18\x01 \x01(\x0c\"C\n\x0fNewUltraRequest\x12$\n\x04peer\x18\x01 \x01(\x0b\x32\x16.bootstrap.PeerAddress\x12\n\n\x02id\x18\x02 \x01(\x05\x32\x93\x02\n\tBootstrap\x12\x45\n\x10RequestBootstrap\x12\x16.bootstrap.JoinRequest\x1a\x17.bootstrap.JoinResponse\"\x00\x12<\n\x0b\x45xitNetwork\x12\x16.bootstrap.ExitRequest\x1a\x13.bootstrap.Response\"\x00\x12\x42\n\tGetUltras\x12\x18.bootstrap.RequestUltras\x1a\x19.bootstrap.UltrasResponse\"\x00\x12=\n\x08NewUltra\x12\x1a.bootstrap.NewUltraRequest\x1a\x13.bootstrap.Response\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -39,12 +39,14 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_JOINRESPONSE']._serialized_end=230
   _globals['_EXITREQUEST']._serialized_start=232
   _globals['_EXITREQUEST']._serialized_end=302
-  _globals['_EXITRESPONSE']._serialized_start=304
-  _globals['_EXITRESPONSE']._serialized_end=331
-  _globals['_REQUESTULTRAS']._serialized_start=333
-  _globals['_REQUESTULTRAS']._serialized_end=386
-  _globals['_ULTRASRESPONSE']._serialized_start=388
-  _globals['_ULTRASRESPONSE']._serialized_end=419
-  _globals['_BOOTSTRAP']._serialized_start=422
-  _globals['_BOOTSTRAP']._serialized_end=638
+  _globals['_RESPONSE']._serialized_start=304
+  _globals['_RESPONSE']._serialized_end=327
+  _globals['_REQUESTULTRAS']._serialized_start=329
+  _globals['_REQUESTULTRAS']._serialized_end=382
+  _globals['_ULTRASRESPONSE']._serialized_start=384
+  _globals['_ULTRASRESPONSE']._serialized_end=415
+  _globals['_NEWULTRAREQUEST']._serialized_start=417
+  _globals['_NEWULTRAREQUEST']._serialized_end=484
+  _globals['_BOOTSTRAP']._serialized_start=487
+  _globals['_BOOTSTRAP']._serialized_end=762
 # @@protoc_insertion_point(module_scope)
