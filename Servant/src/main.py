@@ -1,4 +1,4 @@
-import grpc, threading, os, subprocess, platform
+import grpc, threading, builtins,sys
 from pathlib import Path
 
 from Servant.src.application.leaf_peer import Peer
@@ -13,43 +13,38 @@ from Servant.test.bloom_test_util import create_keyword_list
 from Host_cache_server.grpc_bootstrap import bootstrap_pb2
 from Host_cache_server.grpc_bootstrap import bootstrap_pb2_grpc
 
+def smart_print(*args, **kwargs):
+    msg = " ".join(map(str, args))
+    sys.stdout.write(f"\r\033[K{msg}\n")
+    sys.stdout.write("Enter the file name you want (or type 'quit' to exit server): ")
+    sys.stdout.flush()
+
+builtins.print = smart_print
+
 def request_bootstrap():
     """
     gRPC client call for request_bootstrap
     """
-    with grpc.insecure_channel(f"{config.SERVER}:{config.PORT + 1}") as channel:
+    with grpc.insecure_channel(f"{config.SERVER}:{config.PORT}") as channel:
         stub = bootstrap_pb2_grpc.BootstrapStub(channel)
         try:
-            response = stub.RequestBootstrap(bootstrap_pb2.JoinRequest(ip=peer_settings.HOST, port=peer_settings.PORT))
-            print(f"Bootstrap response:\nSubnet ID: {response.subnetId}.")
+            response = stub.RequestBootstrap(bootstrap_pb2.JoinRequest(peer=bootstrap_pb2.PeerAddress(ip=peer_settings.HOST, port=peer_settings.PORT)))
+            print(f"Bootstrap response:\nSubnet ID: {response.subnet_id}.\n")
             for node in response.subnet:
                 print(f"{node.ip}:{node.port}")
             return response
         except grpc.RpcError as e:
             print("Request bootstrap failed:", e.code(), e.details())
 
-def open_file_in_default_app(filepath):
-    """
-    Opens a file using the OS's default application.
-    
-    :param filepath: path of file to open
-    """
-    if platform.system() == "Windows":
-        os.startfile(filepath)
-    elif platform.system() == "Darwin":
-        subprocess.run(["open", filepath])
-    else:
-        subprocess.run(["xdg-open", filepath])
-
 if "__main__" == __name__:
     # Bootstrap
     result = request_bootstrap()
 
     # Initialize peer
-    peer = Peer()
+    peer = Peer(peer_settings.HOST, peer_settings.PORT)
     if len(result.subnet) == 1:
-        peer = UltraPeer()
-    peer.subnet_id = result.subnetId
+        peer = UltraPeer(peer_settings.HOST, peer_settings.PORT)
+    peer.subnet_id = result.subnet_id
     peer.network_table = network_table()
     if peer.__class__ == UltraPeer:
         peer.network_table.add_peer(result.subnet[0].ip, result.subnet[0].port, False)
@@ -68,10 +63,10 @@ if "__main__" == __name__:
 
         peer.ping_bloom_filter()
     else:
-        peer.bloom_table = bloom_table((peer_settings.HOST, peer_settings.PORT), peer.bloom_filter)
+        peer.bloom_table = bloom_table((peer.ip, peer.port), peer.bloom_filter)
     
     # Run PeerService server
-    PeerServiceThread = threading.Thread(target=peer.PeerServe)
+    PeerServiceThread = threading.Thread(target=peer.PeerServe, args=(peer.ip, peer.port))
     PeerServiceThread.start()
     try:
         PeerServiceThread.join()
