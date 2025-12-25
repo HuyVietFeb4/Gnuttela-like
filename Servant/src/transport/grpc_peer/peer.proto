@@ -3,17 +3,14 @@ package peer;
 
 service PeerService {
     rpc Announce (PeerAddress) returns (PeerAddress) {}
-    rpc ElectLeader (ElectionMsg) returns (Response) {}
     rpc ExitNetwork (PeerAddress) returns (Response) {}
     rpc PingBloom (BloomFilter) returns (Response) {}
     rpc QueryFile (Query) returns (QueryResult) {}
     rpc QuerySelf (Query) returns (QueryResult) {}
     rpc QueryEach (Query) returns (Files) {}
     rpc DownloadFile (FileName) returns (stream Chunk) {}
-}
-
-message ElectionMsg {
-    bytes id = 1;
+    rpc Bully (BullyRequest) returns (Response) {}
+    rpc LeaderElection (PeerAddress) returns (Response) {}
 }
 
 message Response {
@@ -48,4 +45,9 @@ message FileName {
 
 message Chunk {
     bytes buffer = 1;
+}
+
+message BullyRequest {
+    PeerAddress peer = 1;
+    bytes id = 2;
 }

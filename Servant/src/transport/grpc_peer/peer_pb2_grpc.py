@@ -39,11 +39,6 @@ class PeerServiceStub(object):
                 request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.SerializeToString,
                 response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.FromString,
                 _registered_method=True)
-        self.ElectLeader = channel.unary_unary(
-                '/peer.PeerService/ElectLeader',
-                request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.ElectionMsg.SerializeToString,
-                response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
-                _registered_method=True)
         self.ExitNetwork = channel.unary_unary(
                 '/peer.PeerService/ExitNetwork',
                 request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.SerializeToString,
@@ -74,18 +69,22 @@ class PeerServiceStub(object):
                 request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.FileName.SerializeToString,
                 response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Chunk.FromString,
                 _registered_method=True)
+        self.Bully = channel.unary_unary(
+                '/peer.PeerService/Bully',
+                request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.BullyRequest.SerializeToString,
+                response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
+                _registered_method=True)
+        self.LeaderElection = channel.unary_unary(
+                '/peer.PeerService/LeaderElection',
+                request_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.SerializeToString,
+                response_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
+                _registered_method=True)
 
 
 class PeerServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def Announce(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def ElectLeader(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -127,6 +126,18 @@ class PeerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def Bully(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def LeaderElection(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_PeerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -134,11 +145,6 @@ def add_PeerServiceServicer_to_server(servicer, server):
                     servicer.Announce,
                     request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.FromString,
                     response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.SerializeToString,
-            ),
-            'ElectLeader': grpc.unary_unary_rpc_method_handler(
-                    servicer.ElectLeader,
-                    request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.ElectionMsg.FromString,
-                    response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.SerializeToString,
             ),
             'ExitNetwork': grpc.unary_unary_rpc_method_handler(
                     servicer.ExitNetwork,
@@ -170,6 +176,16 @@ def add_PeerServiceServicer_to_server(servicer, server):
                     request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.FileName.FromString,
                     response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Chunk.SerializeToString,
             ),
+            'Bully': grpc.unary_unary_rpc_method_handler(
+                    servicer.Bully,
+                    request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.BullyRequest.FromString,
+                    response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.SerializeToString,
+            ),
+            'LeaderElection': grpc.unary_unary_rpc_method_handler(
+                    servicer.LeaderElection,
+                    request_deserializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.FromString,
+                    response_serializer=Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'peer.PeerService', rpc_method_handlers)
@@ -198,33 +214,6 @@ class PeerService(object):
             '/peer.PeerService/Announce',
             Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.SerializeToString,
             Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def ElectLeader(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/peer.PeerService/ElectLeader',
-            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.ElectionMsg.SerializeToString,
-            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
             options,
             channel_credentials,
             insecure,
@@ -387,6 +376,60 @@ class PeerService(object):
             '/peer.PeerService/DownloadFile',
             Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.FileName.SerializeToString,
             Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Chunk.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def Bully(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/peer.PeerService/Bully',
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.BullyRequest.SerializeToString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def LeaderElection(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/peer.PeerService/LeaderElection',
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.PeerAddress.SerializeToString,
+            Servant_dot_src_dot_transport_dot_grpc__peer_dot_peer__pb2.Response.FromString,
             options,
             channel_credentials,
             insecure,

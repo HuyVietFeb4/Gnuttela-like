@@ -24,31 +24,31 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n*Servant/src/transport/grpc_peer/peer.proto\x12\x04peer\"\x19\n\x0b\x45lectionMsg\x12\n\n\x02id\x18\x01 \x01(\x0c\"\x17\n\x08Response\x12\x0b\n\x03msg\x18\x01 \x01(\t\"\'\n\x0bPeerAddress\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"@\n\x0b\x42loomFilter\x12\"\n\x07\x61\x64\x64ress\x18\x01 \x01(\x0b\x32\x11.peer.PeerAddress\x12\r\n\x05\x62loom\x18\x02 \x01(\x0c\"\x18\n\x05Query\x12\x0f\n\x07keyword\x18\x01 \x01(\t\"\x1c\n\x0bQueryResult\x12\r\n\x05\x66iles\x18\x01 \x01(\x0c\"\x1a\n\x05\x46iles\x12\x11\n\tfile_list\x18\x01 \x03(\t\"\x18\n\x08\x46ileName\x12\x0c\n\x04\x66ile\x18\x01 \x01(\t\"\x17\n\x05\x43hunk\x12\x0e\n\x06\x62uffer\x18\x01 \x01(\x0c\x32\x93\x03\n\x0bPeerService\x12\x32\n\x08\x41nnounce\x12\x11.peer.PeerAddress\x1a\x11.peer.PeerAddress\"\x00\x12\x32\n\x0b\x45lectLeader\x12\x11.peer.ElectionMsg\x1a\x0e.peer.Response\"\x00\x12\x32\n\x0b\x45xitNetwork\x12\x11.peer.PeerAddress\x1a\x0e.peer.Response\"\x00\x12\x30\n\tPingBloom\x12\x11.peer.BloomFilter\x1a\x0e.peer.Response\"\x00\x12-\n\tQueryFile\x12\x0b.peer.Query\x1a\x11.peer.QueryResult\"\x00\x12-\n\tQuerySelf\x12\x0b.peer.Query\x1a\x11.peer.QueryResult\"\x00\x12\'\n\tQueryEach\x12\x0b.peer.Query\x1a\x0b.peer.Files\"\x00\x12/\n\x0c\x44ownloadFile\x12\x0e.peer.FileName\x1a\x0b.peer.Chunk\"\x00\x30\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n*Servant/src/transport/grpc_peer/peer.proto\x12\x04peer\"\x17\n\x08Response\x12\x0b\n\x03msg\x18\x01 \x01(\t\"\'\n\x0bPeerAddress\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x0c\n\x04port\x18\x02 \x01(\x05\"@\n\x0b\x42loomFilter\x12\"\n\x07\x61\x64\x64ress\x18\x01 \x01(\x0b\x32\x11.peer.PeerAddress\x12\r\n\x05\x62loom\x18\x02 \x01(\x0c\"\x18\n\x05Query\x12\x0f\n\x07keyword\x18\x01 \x01(\t\"\x1c\n\x0bQueryResult\x12\r\n\x05\x66iles\x18\x01 \x01(\x0c\"\x1a\n\x05\x46iles\x12\x11\n\tfile_list\x18\x01 \x03(\t\"\x18\n\x08\x46ileName\x12\x0c\n\x04\x66ile\x18\x01 \x01(\t\"\x17\n\x05\x43hunk\x12\x0e\n\x06\x62uffer\x18\x01 \x01(\x0c\";\n\x0c\x42ullyRequest\x12\x1f\n\x04peer\x18\x01 \x01(\x0b\x32\x11.peer.PeerAddress\x12\n\n\x02id\x18\x02 \x01(\x0c\x32\xc5\x03\n\x0bPeerService\x12\x32\n\x08\x41nnounce\x12\x11.peer.PeerAddress\x1a\x11.peer.PeerAddress\"\x00\x12\x32\n\x0b\x45xitNetwork\x12\x11.peer.PeerAddress\x1a\x0e.peer.Response\"\x00\x12\x30\n\tPingBloom\x12\x11.peer.BloomFilter\x1a\x0e.peer.Response\"\x00\x12-\n\tQueryFile\x12\x0b.peer.Query\x1a\x11.peer.QueryResult\"\x00\x12-\n\tQuerySelf\x12\x0b.peer.Query\x1a\x11.peer.QueryResult\"\x00\x12\'\n\tQueryEach\x12\x0b.peer.Query\x1a\x0b.peer.Files\"\x00\x12/\n\x0c\x44ownloadFile\x12\x0e.peer.FileName\x1a\x0b.peer.Chunk\"\x00\x30\x01\x12-\n\x05\x42ully\x12\x12.peer.BullyRequest\x1a\x0e.peer.Response\"\x00\x12\x35\n\x0eLeaderElection\x12\x11.peer.PeerAddress\x1a\x0e.peer.Response\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'Servant.src.transport.grpc_peer.peer_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_ELECTIONMSG']._serialized_start=52
-  _globals['_ELECTIONMSG']._serialized_end=77
-  _globals['_RESPONSE']._serialized_start=79
-  _globals['_RESPONSE']._serialized_end=102
-  _globals['_PEERADDRESS']._serialized_start=104
-  _globals['_PEERADDRESS']._serialized_end=143
-  _globals['_BLOOMFILTER']._serialized_start=145
-  _globals['_BLOOMFILTER']._serialized_end=209
-  _globals['_QUERY']._serialized_start=211
-  _globals['_QUERY']._serialized_end=235
-  _globals['_QUERYRESULT']._serialized_start=237
-  _globals['_QUERYRESULT']._serialized_end=265
-  _globals['_FILES']._serialized_start=267
-  _globals['_FILES']._serialized_end=293
-  _globals['_FILENAME']._serialized_start=295
-  _globals['_FILENAME']._serialized_end=319
-  _globals['_CHUNK']._serialized_start=321
-  _globals['_CHUNK']._serialized_end=344
-  _globals['_PEERSERVICE']._serialized_start=347
-  _globals['_PEERSERVICE']._serialized_end=750
+  _globals['_RESPONSE']._serialized_start=52
+  _globals['_RESPONSE']._serialized_end=75
+  _globals['_PEERADDRESS']._serialized_start=77
+  _globals['_PEERADDRESS']._serialized_end=116
+  _globals['_BLOOMFILTER']._serialized_start=118
+  _globals['_BLOOMFILTER']._serialized_end=182
+  _globals['_QUERY']._serialized_start=184
+  _globals['_QUERY']._serialized_end=208
+  _globals['_QUERYRESULT']._serialized_start=210
+  _globals['_QUERYRESULT']._serialized_end=238
+  _globals['_FILES']._serialized_start=240
+  _globals['_FILES']._serialized_end=266
+  _globals['_FILENAME']._serialized_start=268
+  _globals['_FILENAME']._serialized_end=292
+  _globals['_CHUNK']._serialized_start=294
+  _globals['_CHUNK']._serialized_end=317
+  _globals['_BULLYREQUEST']._serialized_start=319
+  _globals['_BULLYREQUEST']._serialized_end=378
+  _globals['_PEERSERVICE']._serialized_start=381
+  _globals['_PEERSERVICE']._serialized_end=834
 # @@protoc_insertion_point(module_scope)
