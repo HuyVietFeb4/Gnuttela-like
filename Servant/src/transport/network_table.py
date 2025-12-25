@@ -42,8 +42,8 @@ class network_table:
     def get_peer_id(self, ip, port):
         return self.network_table[(ip, port)]['peer_id']
     
-    def get_peers_addresses(self):
-        return list(self.network_table.keys())[:-1]
+    def get_peers_addresses(self, ip, port):
+        return [address for address in [*self.network_table.keys()] if address != (ip, port)]
     
     def get_ultra_peer(self):
         for key, value in self.network_table.items():
