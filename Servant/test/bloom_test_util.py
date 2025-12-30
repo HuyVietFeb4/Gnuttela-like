@@ -1,7 +1,7 @@
 import sys
 sys.path.append("../")
-from src.data_processing.data_processing import data_processing_util 
-from src.application.bloom import BloomFilter, KM_BloomFilter, Compact_BloomFilter, Compact_Refined_BloomFilter, Yes_No_BloomFilter
+from Servant.src.data_processing.data_processing import data_processing_util 
+from Servant.src.application.bloom import BloomFilter, KM_BloomFilter, Compact_BloomFilter, Compact_Refined_BloomFilter, Yes_No_BloomFilter
 import re
 import csv
 import random

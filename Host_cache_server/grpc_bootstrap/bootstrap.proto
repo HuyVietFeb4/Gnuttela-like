@@ -1,0 +1,45 @@
+syntax = "proto3";
+package bootstrap;
+
+service Bootstrap {
+    rpc RequestBootstrap (JoinRequest) returns (JoinResponse) {}
+    rpc ExitNetwork (ExitRequest) returns (Response) {}
+    rpc GetUltras (RequestUltras) returns (UltrasResponse) {}
+    rpc NewUltra (NewUltraRequest) returns (Response) {}
+}
+
+message PeerAddress {
+    string ip = 1;
+    int32 port = 2;
+}
+
+message JoinRequest {
+    PeerAddress peer = 1;
+}
+
+message JoinResponse {
+    int32 subnet_id = 1;
+    repeated PeerAddress subnet = 2;
+}
+
+message ExitRequest {
+    PeerAddress peer = 1;
+    int32 subnet_id = 2;
+}
+
+message Response {
+    string msg = 1;
+}
+
+message RequestUltras {
+    PeerAddress peer = 1;
+}
+
+message UltrasResponse {
+    bytes nodes = 1;
+}
+
+message NewUltraRequest {
+    PeerAddress peer = 1;
+    int32 id = 2;
+}
